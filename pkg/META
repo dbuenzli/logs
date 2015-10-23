@@ -1,0 +1,53 @@
+description = "Logging infrastructure for OCaml"
+version = "%%VERSION%%"
+
+requires = "result"
+archive(byte) = "logs.cma"
+archive(byte, plugin) = "logs.cma"
+archive(native) = "logs.cmxa"
+archive(native, plugin) = "logs.cmxs"
+exists_if = "logs.cma"
+
+package "stdo" (
+  description = "Standard outputs reporter for Logs"
+  version = "%%VERSION%%"
+  requires = "logs cmdliner fmt"
+  archive(byte) = "logs_stdo.cma"
+  archive(byte, plugin) = "logs_stdo.cma"
+  archive(native) = "logs_stdo.cmxa"
+  archive(native, plugin) = "logs_stdo.cmxs"
+  exists_if = "logs_stdo.cma"
+)
+
+package "browser" (
+  description = "Browser console reporter for Logs"
+  version = "%%VERSION%%"
+  requires = "logs js_of_ocaml"
+  archive(byte) = "logs_browser.cma"
+  archive(byte, plugin) = "logs_browser.cma"
+  archive(native) = "logs_browser.cmxa"
+  archive(native, plugin) = "logs_browser.cmxs"
+  exists_if = "logs_browser.cma"
+)
+
+package "cli" (
+  description = "Cmdliner support for Logs"
+  version = "%%VERSION%%"
+  requires = "logs cmdliner"
+  archive(byte) = "logs_cli.cma"
+  archive(byte, plugin) = "logs_cli.cma"
+  archive(native) = "logs_cli.cmxa"
+  archive(native, plugin) = "logs_cli.cmxs"
+  exists_if = "logs_cli.cma"
+)
+
+package "top" (
+  description = "Logs toplevel support"
+  version = "%%VERSION%%"
+  requires = "fmt.top logs logs.stdo"
+  archive(byte) = "logs_top.cma"
+  archive(byte, plugin) = "logs_top.cma"
+  archive(native) = "logs_top.cmxa"
+  archive(native, plugin) = "logs_top.cmxs"
+  exists_if = "logs_top.cma"
+)
