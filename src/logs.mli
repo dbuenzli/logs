@@ -228,7 +228,7 @@ val kmsg : (unit -> 'a) -> ?src:src -> level ->
   ((?header:string -> ?tags:Tag.set -> 'b) -> 'a) -> 'a
 (** [kmsg k] is like {!msg} but calls [k] for returning. *)
 
-(** {2:result Loging [result] errors} *)
+(** {2:result Logging [result] errors} *)
 
 val on_error : ?src:src -> ?level:level -> ?header:string -> ?tags:Tag.set ->
   pp:(Format.formatter -> 'b -> unit) -> use:'a -> ('a, 'b) result -> 'a

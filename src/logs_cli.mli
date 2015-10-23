@@ -14,7 +14,7 @@
 
 val level : ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
     Logs.level option Cmdliner.Term.t
-(** [verbose ?env ?docs ()] is a term for two {!Cmdliner} options that
+(** [level ?env ?docs ()] is a term for two {!Cmdliner} options that
     can be used with {!Logs.set_level}.  The options are documented
     under [docs] (defaults to the default of {!Cmdliner.Arg.info}).
 
