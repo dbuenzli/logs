@@ -157,12 +157,8 @@ type reporter =
       ('a, Format.formatter, unit, 'b) format4 ->
       ((?header:string -> ?tags:Tag.set -> 'a) -> 'b) -> 'b }
 
-let invalid_report src level k fmt msgf =
-  invalid_arg "No Logs reporter set before logging started. \
-               Did you forget to call Logs.set_reporter ?"
-
-let invalid_reporter = { report = invalid_report }
-let _reporter = ref invalid_reporter
+let nop_reporter = { report = fun _ _ k _ _ -> k () }
+let _reporter = ref nop_reporter
 let set_reporter r = _reporter := r
 let reporter () = !_reporter
 

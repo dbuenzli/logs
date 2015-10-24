@@ -335,10 +335,9 @@ type reporter =
     {- [fmt] is the message format string.}
     {- [msgf] is the {{!msgf}message formatting function} to call.}} *)
 
-val invalid_reporter : reporter
-(** [invalid_reporter] is initial reporter returned by {!reporter}, it
-    raises [Invalid_argument] exception if a log message gets
-    reported. *)
+val nop_reporter : reporter
+(** [nop_reporter] is the initial reporter returned by {!reporter}, it
+    does nothing if a log message gets reported. *)
 
 val reporter : unit -> reporter
 (** [reporter ()] is the current repporter. *)
@@ -358,10 +357,11 @@ val warn_count : unit -> int
 
 (** {1:basics Basics}
 
-    If you are writing an application you must remember to {{!set_reporter}set}
-    the reporter before any logging operation takes place otherwise
-    [Invalid_argument] will be raised. For example if you are using the
-    {{!Logs_stdo}standard outputs reporter}, logging can be setup as follows:
+    If you are writing an application you must remember to
+    {{!set_reporter}set} the reporter before any logging operation
+    takes place otherwise no messages will be reported. For example if
+    you are using the {{!Logs_stdo}standard outputs reporter}, logging
+    can be setup as follows:
 {[
 let main () =
   Logs.set_reporter (Logs_stdo.reporter ());
@@ -373,7 +373,7 @@ let main () =
     initialization code of modules (not a good idea) or you depend on
     (bad) libraries that do so, you must call and link the reporter
     install code before these initialization bits are being
-    executed otherwise these message will raise [Invalid_argument].
+    executed otherwise you will miss these messages.
 
     The documentation of {!Logs_cli} module has a {{!Logs_cli.ex}full setup
     example} that includes command line options to control color and log
