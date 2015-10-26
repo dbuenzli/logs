@@ -4,8 +4,11 @@
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
+(* Console reporter *)
+
 let console_obj = Js.Unsafe.variable "console"
-let console level s =
+let console : Logs.level -> string -> unit =
+fun level s ->
   let meth = match level with
   | Logs.Error -> "error"
   | Logs.Warning -> "warn"
@@ -20,16 +23,14 @@ let ppf, flush =
   let flush () = let s = Buffer.contents b in Buffer.clear b; s in
   Format.formatter_of_buffer b, flush
 
-let reporter dst src level k fmt msgf =
-  let k _ = dst level (flush ()); k () in
+let console_report src level k fmt msgf =
+  let k _ = console level (flush ()); k () in
   msgf @@ fun ?header ?tags ->
   match header with
   | None -> Format.kfprintf k ppf ("@[" ^^ fmt ^^ "@]@.")
   | Some h -> Format.kfprintf k ppf ("[%s] @[" ^^ fmt ^^ "@]@.") h
 
-let reporter ?(dst = console) () =
-  let report src level k fmt = reporter dst src level k fmt in
-  { Logs.report = report }
+let console_reporter () = { Logs.report = console_report }
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli.

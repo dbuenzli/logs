@@ -4,24 +4,19 @@
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-(** Browser reporter for {!Logs}.
+(** Browser reporters for {!Logs}.
 
     {e Release %%VERSION%% - %%MAINTAINER%% } *)
 
 (** {1 Reporter} *)
 
-val console : Logs.level -> string -> unit
-(** [console_dst] is {!reporter}'s default destination which logs
-    everything on the
+val console_reporter : unit -> Logs.reporter
+(** [console_reporter ()] logs message using the
     {{:https://github.com/DeveloperToolsWG/console-object/blob/master/api.md}
-    browser console object} at the corresponding level and uses [console.log]
-    for the [App] level.
+    browser console object} at the corresponding level and uses
+    [console.log] for the [App] level.
 
     Consult the {{:http://caniuse.com/#search=console}browser support}. *)
-
-val reporter : ?dst:(Logs.level -> string -> unit) -> unit -> Logs.reporter
-(** [reporter ~dst ()] reports using destination [dst] (defaults to
-    {!console}). *)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli.
