@@ -37,7 +37,8 @@ val set_level : ?all:bool -> level option -> unit
 (** [set_level ?all l] sets the reporting level given to
     {{!Src.create}new sources}. If [all] is [true] (default), also
     sets the reporting level of all {{!Src.list}existing sources}. Use
-    {!Src.set_level} to only affect a specific source. *)
+    {!Src.set_level} to only affect a specific source. Only applications
+    should use this function directly see {{!usage}usage conventions}. *)
 
 type src
 (** The type for log sources. A source defines a named unit of logging
@@ -56,9 +57,12 @@ module Src : sig
   (** The type for log sources. *)
 
   val create : ?doc:string -> string -> src
-  (** [create ?doc name] is a log source named [name]. [doc] is a documentation
-      string describing the source, defaults to ["undocumented"]. Its
-      initial reporting level is defined by {!Logs.level}. *)
+  (** [create ?doc name] is a new log source. [name] is the name of
+      the source; it doesn't need to be unique but it is good practice
+      to prefix the name with the name of your package or library
+      (e.g. ["mypkg.network"]). [doc] is a documentation string
+      describing the source, defaults to ["undocumented"]. The initial
+      reporting level of the source is defined by {!Logs.level}. *)
 
   val name : src -> string
   (** [name] is [src]'s name. *)
@@ -167,18 +171,18 @@ type 'a msgf = (?header:string -> ?tags:Tag.set -> 'a) -> unit
 
     Message formatting functions are called with a message
     construction function whenever a message needs to be reported. The
-    message formatting function must call the construction function
-    with the arguments of the message. The arguments of the message
-    are defined by the format string of the log function see
-    {!log}. The optional arguments of the message construction
-    function are:
+    message formatting function must call the given message
+    construction function with the arguments of the message. The
+    arguments of the message are defined by the format string of the
+    log function see {!log} for examples. The optional arguments of the message
+    construction function are:
     {ul
-    {- [header], a printable message header. Default to [None].}
-    {- [tags], a list of tags to attach to the message. Defaults
+    {- [header], an optional printable message header. Default to [None].}
+    {- [tags], a set of tags to attach to the message. Defaults
        {!Tag.empty}.}} *)
 
 val unit_msgf : ?header:string -> ?tags:Tag.set -> unit -> unit msgf
-(** [unit_msgf ?header ?tags ()] is [(fun msg -> msg ?header ?tags)]. *)
+(** [unit_msgf ?header ?tags ()] is [(fun m -> m ?header ?tags)]. *)
 
 val unit : unit msgf
 (** [unit] is {!unit_msgf}[ ()]. *)
@@ -192,15 +196,15 @@ type 'a log = ('a, Format.formatter, unit) format -> 'a msgf -> unit
     logging structure:
 {[
 Logs.err "invalid key value pair (%a,%a)"
-  (fun msg -> msg pp_key key pp_val value);
+  (fun m -> m pp_key key pp_val value);
 ]}
     The pattern is quite simple: it is as if you were formatting as
-    usual except you need to interpose the function with the [msg]
+    usual except you need to interpose the function with the [m]
     argument standing for the format string. If your format string has no
     directives, the type system will annoy you with the formatting function
     because of the optional arguments. You have to write:
 {[
-Logs.err "You are doomed!" (fun msg -> msg ?header:None ?tags:None);
+Logs.err "You are doomed!" (fun m -> m ?header:None ?tags:None);
 ]}
     To avoid this [Logs] provides the constant formatter {!Logs.unit}
     so that you can simply write:
@@ -209,8 +213,9 @@ Logs.err "You are doomed!" Logs.unit;
 ]} *)
 
 val msg : ?src:src -> level -> 'a log
-(** [msg ?src l fmt (fun msg -> msg ...)] logs with level [l] on the source
-    [src] (defaults to {!default}) a message formatted with [fmt]. *)
+(** [msg ?src l fmt (fun m -> m ...)] logs with level [l] on the source
+    [src] (defaults to {!default}) a message formatted with [fmt]. For the
+    semantics of levels see the {{!usage}the usage conventions}. *)
 
 val app : ?src:src -> 'a log
 (** [app] is [msg App]. *)
@@ -266,8 +271,9 @@ module type LOG = sig
   (** {1:func Log functions} *)
 
   val msg : level -> 'a log
-  (** [msg l fmt (fun msg -> msg ...)] logs with level [l]
-      a message formatted with [fmt]. *)
+  (** [msg l fmt (fun m -> m ...)] logs with level [l] a message
+      formatted with [fmt]. For the semantics of levels see the
+      {{!usage}the usage conventions}. *)
 
   val app : 'a log
   (** [app] is [msg App]. *)

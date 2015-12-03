@@ -16,15 +16,15 @@ val reporter :
   ?app:Format.formatter -> unit -> Logs.reporter
 (** [reporter ~exec ~dst ~app ()] is a reporter that reports {!Logs.App}
     level messages on [app] (defaults to {!Format.std_formatter}) and
-    all other levels on [dst] (defaults {!Format.err_formatter}).
+    all other levels on [dst] (defaults to {!Format.err_formatter}).
 
     If [exec] is [Some e] messages on [dst] are prefixed by [e] which is
     recommended if you are doing a simple command line tool (defaults to
-    [Some b] where [b] is the basename of [Sys.argv.(0)]).
+    [Some e] with [e] the {{!Filename.basename}basename} of [Sys.argv.(0)]).
 
     ANSI colors will be used in the output if the formatters are
     configured to do so, see {!Fmt.set_style_renderer} and
-    {!Fmt_tty}. *)
+    {!Fmt_tty}. Consult a {{!Logs_cli.ex}full setup example}. *)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli.

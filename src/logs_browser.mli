@@ -4,11 +4,11 @@
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-(** Browser reporters for {!Logs}.
+(** Web browser reporters for {!Logs}.
 
     {e Release %%VERSION%% - %%MAINTAINER%% } *)
 
-(** {1 Reporter} *)
+(** {1 Reporters} *)
 
 val console_reporter : unit -> Logs.reporter
 (** [console_reporter ()] logs message using the
