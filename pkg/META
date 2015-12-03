@@ -11,7 +11,7 @@ exists_if = "logs.cma"
 package "stdo" (
   description = "Standard outputs reporter for Logs"
   version = "%%VERSION%%"
-  requires = "logs cmdliner fmt"
+  requires = "logs fmt"
   archive(byte) = "logs_stdo.cma"
   archive(byte, plugin) = "logs_stdo.cma"
   archive(native) = "logs_stdo.cmxa"
