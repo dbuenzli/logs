@@ -18,13 +18,19 @@ let level () = !_level
 
 module Src = struct
   type t =
-    { name : string;
+    { uid : int;
+      name : string;
       doc : string;
       mutable level : level option }
 
+  let uid =
+    let id = ref (-1) in
+    fun () -> incr id; !id
+
   let list = ref []
+
   let create ?(doc = "undocumented") name =
-    let src = { name; doc; level = !_level } in
+    let src = { uid = uid (); name; doc; level = !_level } in
     list := src :: !list;
     src
 
@@ -32,6 +38,14 @@ module Src = struct
   let doc s = s.doc
   let level s = s.level
   let set_level s l = s.level <- l
+  let equal src0 src1 = src0.uid = src1.uid
+  let compare src0 src1 =
+    (Pervasives.compare : int -> int -> int) src0.uid src1.uid
+
+  let pp ppf src = Format.fprintf ppf
+      "@[<1>(src@ @[<1>(name %S)@]@ @[<1>(uid %d)@] @[<1>(doc %S)@])@]"
+      src.name src.uid src.doc
+
   let list () = !list
 end
 

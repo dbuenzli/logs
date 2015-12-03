@@ -78,6 +78,16 @@ module Src : sig
       applications should use this function directly, see {{!usage}usage
       conventions}. *)
 
+  val equal : src -> src -> bool
+  (** [equal src src'] is [true] iff [src] and [src'] are the same source. *)
+
+  val compare : src -> src -> int
+  (** [compare src src'] is a total order on sources. *)
+
+  val pp : Format.formatter -> src -> unit
+  (** [pp ppf src] prints an unspecified representation of [src] on
+      [ppf]. *)
+
   val list : unit -> src list
   (** [list ()] is the current exisiting source list. *)
 end
