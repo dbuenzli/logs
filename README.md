@@ -9,11 +9,12 @@ report is decoupled from logging and is handled by a reporter.
 A few optional log reporters are distributed with the base library and
 the API easily allows to implement your own.
 
-Logs depends only on the `result` compatibility package. The optional
-standard outputs reporter `Logs_stdo` depends on [Fmt][1]. The
-optional browser reporter `Logs_browser` depends on
-[js_of_ocaml][2]. The optional `Logs_cli` library that provides
-command line support for Logs depends on [`Cmdliner`][3].
+`Logs` depends only on the `result` compatibility package. The
+optional `Logs_stdo` reporter on standard outputs depends
+on [Fmt][1].  The `Logs_browser` reporter that reports to the web
+browser console depends on [js_of_ocaml][2]. The optional `Logs_cli`
+library that provides command line support for controlling Logs
+depends on [`Cmdliner`][3].
 
 Logs and its reporters are distributed under the BSD3 license.
 
