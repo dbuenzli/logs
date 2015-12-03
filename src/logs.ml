@@ -92,7 +92,7 @@ module Tag = struct
     fun () -> incr id; !id
 
   let def ?(doc = "undocumented") name pp =
-    { uid = uid (); tid = tid();  name; doc; pp }
+    { uid = uid (); tid = tid ();  name; doc; pp }
 
   let name d = d.name
   let doc d = d.doc

@@ -57,7 +57,7 @@ module Src : sig
 
   val create : ?doc:string -> string -> src
   (** [create ?doc name] is a log source named [name]. [doc] is a documentation
-      string for describing the source, defaults to ["undocumented"]. Its
+      string describing the source, defaults to ["undocumented"]. Its
       initial reporting level is defined by {!Logs.level}. *)
 
   val name : src -> string
@@ -89,16 +89,18 @@ module Tag : sig
   (** {1 Tag definitions} *)
 
   type 'a def
-  (** The type for tag definitions with values of type ['a]. *)
+  (** The type for tag definitions. The type ['a] is the type of the
+      tag. The definition specifies a name for the tag, a pretty-printer
+      for the type of the tag and a documentation string. See {!val:def}. *)
 
   (** The type for existential tag definitions. *)
   type def_e = Def : 'a def -> def_e
 
   val def : ?doc:string -> string -> (Format.formatter -> 'a -> unit) -> 'a def
-  (** [def ~doc name pp] is a tag definition for a tag named
-      [name]. [pp] is a printer for the tag value. [doc] is a
-      documentation string for describing the tag, defaults to
-      ["undocumented"]. *)
+  (** [def ~doc name pp] is a tag definition. [name] is the name of
+      the tag, it doesn't need to be unique. [pp] is a printer for the
+      type of the tag. [doc] is a documentation string describing
+      the tag (defaults to ["undocumented"]). *)
 
   val name : 'a def -> string
   (** [name d] is [d]'s name. *)
@@ -107,7 +109,7 @@ module Tag : sig
   (** [doc d] is [d]'s documentation string. *)
 
   val printer : 'a def -> (Format.formatter -> 'a -> unit)
-  (** [printer d] is [d]'s pretty-printer. *)
+  (** [printer d] is [d]'s type pretty-printer. *)
 
   val pp_def : Format.formatter -> 'a def -> unit
   (** [pp_def ppf d] prints an unspecified representation of [d] on [ppf]. *)
@@ -115,9 +117,9 @@ module Tag : sig
   val list : unit -> def_e list
   (** [tag_list ()] is the list of currently existing tag definitions. *)
 
-  (** {1 Tag values} *)
+  (** {1 Tags} *)
 
-  (** The type for tag values. *)
+  (** The type for tags. Tuples the tag definition and its value. *)
   type t = V : 'a def * 'a -> t
 
   val pp : Format.formatter -> t -> unit
@@ -126,7 +128,8 @@ module Tag : sig
   (** {1 Tag sets} *)
 
   type set
-  (** The type for tag sets. *)
+  (** The type for tag sets. A tag set contains at most one tag per
+      tag definition. *)
 
   val empty : set
   (** [empty] is the empty set. *)
@@ -135,20 +138,21 @@ module Tag : sig
   (** [is_empty s] is [true] iff [s] is empty. *)
 
   val mem : 'a def -> set -> bool
-  (** [mem d s] is [true] iff the tag [d] is defined in [s]. *)
+  (** [mem d s] is [true] iff [s] has a tag with definition [d]. *)
 
   val add : 'a def -> 'a -> set -> set
-  (** [add d v s] is [s] with tag [d] bound to value [v]. *)
+  (** [add d v s] is [s] with the tag [(V (d, v))] added. If there was a tag
+      with definition [d] in [s] it is replaced. *)
 
   val rem : 'a def -> set -> set
-  (** [rem d s] is [s] without the tag [d]. *)
+  (** [rem d s] is [s] without the tag defined by [d] (if there was one). *)
 
   val find : 'a def -> set -> 'a option
-  (** [find d s] is the tag value of [d] in [s] (if any). *)
+  (** [find d s] is the tag value with definition [d] in [s] (if any). *)
 
   val get : 'a def -> set -> 'a
-  (** [get d s] is like [find d s] but @raise Invalid_argument if [d]
-      is not defined in [s]. *)
+  (** [get d s] is like [find d s] but @raise Invalid_argument if there
+      is no tag with definition [d] in [s]. *)
 
   val fold : (t -> 'a -> 'a) -> set -> 'a -> 'a
   (** [fold f s acc] is the result of folding [f] over the tags
