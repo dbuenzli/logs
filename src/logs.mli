@@ -237,18 +237,19 @@ val kmsg : (unit -> 'a) -> ?src:src -> level ->
   ((?header:string -> ?tags:Tag.set -> 'b) -> 'a) -> 'a
 (** [kmsg k] is like {!msg} but calls [k] for returning. *)
 
-(** {2:result Logging [result] errors} *)
+(** {2:result Logging [result] value [Error]s} *)
 
 val on_error : ?src:src -> ?level:level -> ?header:string -> ?tags:Tag.set ->
-  pp:(Format.formatter -> 'b -> unit) -> use:'a -> ('a, 'b) result -> 'a
+  pp:(Format.formatter -> 'b -> unit) -> use:('b -> 'a) -> ('a, 'b) result -> 'a
 (** [on_error ~level ~pp ~use r] is:
     {ul
-    {- [v] if [r = `Ok v]}
-    {- [use] if [r = `Error msg]. As a side effect [msg] is logged
+    {- [v] if [r = Ok v]}
+    {- [use e] if [r = Error e]. As a side effect [msg] is logged
        with [pp] on level [level] (defaults to {!Logs.Error}).}} *)
 
 val on_error_msg : ?src:src -> ?level:level -> ?header:string ->
-  ?tags:Tag.set -> use:'a -> ('a, [`Msg of string]) result -> 'a
+  ?tags:Tag.set -> use:(unit -> 'a) ->
+  ('a, [`Msg of string]) result -> 'a
 (** [on_error_msg] is like {!on_error} but uses
     {!Format.pp_print_text} to format the message. *)
 
@@ -284,10 +285,11 @@ module type LOG = sig
     ((?header:string -> ?tags:Tag.set -> 'b) -> 'a) -> 'a
   (** [kmsg k] is like {!msg} but calls [k] for returning. *)
 
-  (** {2:result Logging [result] errors} *)
+  (** {2:result Logging [result] value [Error]s} *)
 
   val on_error : ?level:level -> ?header:string -> ?tags:Tag.set ->
-    pp:(Format.formatter -> 'b -> unit) -> use:'a -> ('a, 'b) result -> 'a
+    pp:(Format.formatter -> 'b -> unit) -> use:('b -> 'a) -> ('a, 'b) result ->
+    'a
   (** [on_error ~level ~pp ~use r] is:
       {ul
       {- [v] if [r = `Ok v]}
@@ -295,7 +297,7 @@ module type LOG = sig
          with [pp] on level [level] (defaults to {!Logs.Error}).}} *)
 
   val on_error_msg : ?level:level -> ?header:string -> ?tags:Tag.set ->
-    use:'a -> ('a, [`Msg of string]) result -> 'a
+    use:(unit -> 'a) -> ('a, [`Msg of string]) result -> 'a
   (** [on_error_msg] is like {!on_error} but uses
       {!Format.pp_print_text} to format the message. *)
 end

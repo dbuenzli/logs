@@ -204,13 +204,14 @@ let debug ?src fmt msgf = kmsg kunit ?src Debug fmt msgf
 let on_error ?src ?(level = Error) ?header ?tags ~pp ~use = function
 | Ok v -> v
 | Error e ->
-    kmsg (fun _ -> use) ?src level "@[%a@]" @@ fun fmt ->
-    fmt ?header ?tags pp e
+    kmsg (fun () -> use e) ?src level "@[%a@]" @@ fun m ->
+    m ?header ?tags pp e
 
-let pp_msg ppf (`Msg m) = Format.pp_print_text ppf m
-
-let on_error_msg ?src ?level ?header ?tags ~use =
-  on_error ?src ?level ?header ?tags ~pp:pp_msg ~use
+let on_error_msg ?src ?(level = Error) ?header ?tags ~use = function
+| Ok v -> v
+| Error (`Msg msg) ->
+    kmsg use ?src level "@[%a@]" @@ fun m ->
+    m ?header ?tags Format.pp_print_text msg
 
 (* Source specific logging functions *)
 
@@ -224,10 +225,13 @@ module type LOG = sig
   val kmsg : (unit -> 'a) -> level ->
     ('b, Format.formatter, unit, 'a) format4 ->
     ((?header:string -> ?tags:Tag.set -> 'b) -> 'a) -> 'a
+
   val on_error : ?level:level -> ?header:string -> ?tags:Tag.set ->
-    pp:(Format.formatter -> 'b -> unit) -> use:'a -> ('a, 'b) result -> 'a
+    pp:(Format.formatter -> 'b -> unit) -> use:('b -> 'a) -> ('a, 'b) result ->
+    'a
+
   val on_error_msg : ?level:level -> ?header:string -> ?tags:Tag.set ->
-    use:'a -> ('a, [`Msg of string]) result -> 'a
+    use:(unit -> 'a) -> ('a, [`Msg of string]) result -> 'a
 end
 
 let src_log src =
@@ -239,15 +243,11 @@ let src_log src =
     let warn fmt msgf = msg Warning fmt msgf
     let info fmt msgf = msg Info fmt msgf
     let debug fmt msgf = msg Debug fmt msgf
+    let on_error ?level ?header ?tags ~pp ~use =
+      on_error ~src ?level ?header ?tags ~pp ~use
 
-    let on_error ?(level = Error) ?header ?tags ~pp ~use = function
-    | Ok v -> v
-    | Error e ->
-        kmsg (fun _ -> use) level "@[%a@]" @@ fun fmt ->
-        fmt ?header ?tags pp e
-
-    let on_error_msg ?level ?header ?tags ~use fmt =
-      on_error ?level ?header ?tags ~pp:pp_msg ~use fmt
+    let on_error_msg ?level ?header ?tags ~use =
+      on_error_msg ~src ?level ?header ?tags ~use
   end
   in
   (module Log : LOG)
