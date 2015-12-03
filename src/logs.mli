@@ -97,7 +97,7 @@ end
 (** Message tags.
 
     Message tags are arbitrary named and typed values that can be
-    associated to log messages. *)
+    associated to log messages. See an {{!ex1}example}. *)
 module Tag : sig
 
   (** {1 Tag definitions} *)
@@ -334,7 +334,8 @@ type reporter =
     {- [level] is the reporting level.}
     {- [k] is the function to invoke to return.}
     {- [fmt] is the message format string.}
-    {- [msgf] is the {{!msgf}message formatting function} to call.}} *)
+    {- [msgf] is the {{!msgf}message formatting function} to call.}}
+    See an {{!ex1}example}. *)
 
 val nop_reporter : reporter
 (** [nop_reporter] is the initial reporter returned by {!reporter}, it
@@ -419,7 +420,73 @@ module Log = (val Logs.src_log src : Logs.LOG)
     {- [Info], condition that allows the program {e user} to get a better
        understanding of what the program is doing.}
     {- [Debug], condition that allows the program {e developer} to get a
-       better undersanding of what the program is doing.}} *)
+       better undersanding of what the program is doing.}}
+
+    {1:ex1 Example with custom reporter and tags}
+
+    This example uses a {{!Tag}tag} to attach {!Mtime} time spans in
+    log messages. The custom reporter uses these time spans to format
+    relative timings for runs of a given function. Note that as done
+    below the timings do include logging time.
+{[
+let stamp_tag : Mtime.span Logs.Tag.def =
+  Logs.Tag.def "stamp" ~doc:"Relative monotonic time stamp" Mtime.pp_span
+
+let stamp c = Logs.Tag.(empty |> add stamp_tag (Mtime.count c))
+
+let run () =
+  let rec wait n = if n = 0 then () else wait (n - 1) in
+  let c = Mtime.counter () in
+  Logs.info "Starting run" Logs.unit;
+  let delay1, delay2, delay3 = 10_000, 20_000, 40_000 in
+  Logs.info "Start action 1 (%d)." (fun m -> m ~tags:(stamp c) delay1);
+  wait delay1;
+  Logs.info "Start action 2 (%d)." (fun m -> m ~tags:(stamp c) delay2);
+  wait delay2;
+  Logs.info "Start action 3 (%d)." (fun m -> m ~tags:(stamp c) delay3);
+  wait delay3;
+  Logs.info "Done." (fun m -> m ?header:None ~tags:(stamp c));
+  ()
+
+let reporter ppf =
+  let report src level k fmt msgf =
+    let k _ = k () in
+    let with_stamp tags k ppf fmt =
+      let stamp = match tags with
+      | None -> None
+      | Some tags -> Logs.Tag.find stamp_tag tags
+      in
+      let dt = match stamp with None -> 0. | Some s -> (Mtime.to_us s) in
+      Format.kfprintf k ppf ("[%0+04.0fus] @[" ^^ fmt ^^ "@]@.") dt
+    in
+    msgf @@ fun ?header ?tags -> with_stamp tags k ppf fmt
+  in
+  { Logs.report = report }
+
+let main () =
+  Logs.set_reporter (reporter (Format.std_formatter));
+  Logs.set_level (Some Logs.Info);
+  run ();
+  run ();
+  ()
+
+let () = main ()
+]}
+Here is the standard output of a sample run of the program:
+{v
+[+000us] Starting run
+[+101us] Start action 1 (10000).
+[+122us] Start action 2 (20000).
+[+140us] Start action 3 (40000).
+[+172us] Done.
+[+000us] Starting run
+[+004us] Start action 1 (10000).
+[+017us] Start action 2 (20000).
+[+050us] Start action 3 (40000).
+[+082us] Done.
+v}
+
+*)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli.

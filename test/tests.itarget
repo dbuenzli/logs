@@ -1,4 +1,5 @@
 test_stdo.native
 tool.native
+tags.native
 test_browser.html
 test_browser.byte

@@ -1,4 +1,4 @@
-PKG result fmt fmt.tty fmt.cli js_of_ocaml
+PKG result fmt fmt.tty fmt.cli js_of_ocaml mtime.os
 S src
 S test
 B _build/**

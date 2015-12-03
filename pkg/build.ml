@@ -17,4 +17,5 @@ let () =
     Pkg.lib "src/logs_top_init.ml";
     Pkg.doc "README.md";
     Pkg.doc "CHANGES.md";
-    Pkg.doc "test/tool.ml"; ]
+    Pkg.doc "test/tool.ml";
+    Pkg.doc "test/tags.ml"; ]
