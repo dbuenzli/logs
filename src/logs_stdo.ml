@@ -9,10 +9,10 @@ let warn_style = `Yellow
 let info_style = `Blue
 let debug_style = `Green
 
-let reporter exec dst app src level k fmt msgf =
+let reporter prefix dst app src level k fmt msgf =
   let k _ = k () in
   let with_header style header k ppf fmt =
-    Format.kfprintf k ppf ("%s[%a] @[" ^^ fmt ^^ "@]@.") exec
+    Format.kfprintf k ppf ("%s[%a] @[" ^^ fmt ^^ "@]@.") prefix
       Fmt.(styled style string) header
   in
   msgf @@ fun ?header ?tags ->
@@ -35,13 +35,13 @@ let reporter exec dst app src level k fmt msgf =
       let header = match header with None -> "DEBUG" | Some h -> h in
       with_header debug_style header k dst fmt
 
-let reporter ?exec ?(dst = Fmt.stderr) ?(app = Fmt.stdout)  () =
-  let exec = match exec with
+let reporter ?prefix ?(dst = Fmt.stderr) ?(app = Fmt.stdout)  () =
+  let prefix = match prefix with
   | None -> Printf.sprintf "%s: " (Filename.basename Sys.argv.(0))
   | Some None -> ""
-  | Some Some exec -> Printf.sprintf "%s: " exec
+  | Some Some prefix -> prefix
   in
-  let report src level k fmt = reporter exec dst app src level k fmt in
+  let report src level k fmt = reporter prefix dst app src level k fmt in
   { Logs.report = report }
 
 (*---------------------------------------------------------------------------

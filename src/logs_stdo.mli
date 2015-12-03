@@ -11,16 +11,16 @@
     {1 Reporter} *)
 
 val reporter :
-  ?exec:string option ->
+  ?prefix:string option ->
   ?dst:Format.formatter ->
   ?app:Format.formatter -> unit -> Logs.reporter
-(** [reporter ~exec ~dst ~app ()] is a reporter that reports {!Logs.App}
+(** [reporter ~prefix ~dst ~app ()] is a reporter that reports {!Logs.App}
     level messages on [app] (defaults to {!Format.std_formatter}) and
     all other levels on [dst] (defaults to {!Format.err_formatter}).
 
-    If [exec] is [Some e] messages on [dst] are prefixed by [e] which is
-    recommended if you are doing a simple command line tool (defaults to
-    [Some e] with [e] the {{!Filename.basename}basename} of [Sys.argv.(0)]).
+    If [prefix] is [Some pre] messages on [dst] are prefixed by [pre] which is
+    recommended if you are doing a simple command line tool defaults to
+    [Some (Printf.sprintf "%s: " (Filename.basename Sys.argv.(0))].
 
     ANSI colors will be used in the output if the formatters are
     configured to do so, see {!Fmt.set_style_renderer} and
