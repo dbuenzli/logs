@@ -247,20 +247,9 @@ val on_error : ?src:src -> ?level:level -> ?header:string -> ?tags:Tag.set ->
     {- [use] if [r = `Error msg]. As a side effect [msg] is logged
        with [pp] on level [level] (defaults to {!Logs.Error}).}} *)
 
-val kon_error : ?src:src -> ?level:level -> ?header:string -> ?tags:Tag.set ->
-  pp:(Format.formatter -> 'b -> unit) -> ('a, 'b) result -> ('a, 'b) result
-(** [kon_error ~level ~pp ~use r] has the same effects as {!on_error}
-    except it always returns [r] itself. *)
-
 val on_error_msg : ?src:src -> ?level:level -> ?header:string ->
   ?tags:Tag.set -> use:'a -> ('a, [`Msg of string]) result -> 'a
 (** [on_error_msg] is like {!on_error} but uses
-    {!Format.pp_print_text} to format the message. *)
-
-val kon_error_msg : ?src:src -> ?level:level -> ?header:string ->
-  ?tags:Tag.set -> ('a, [`Msg of string]) result ->
-  ('a, [`Msg of string]) result
-(** [kon_error_msg ~level ~pp ~use r] is like {!kon_error} but uses
     {!Format.pp_print_text} to format the message. *)
 
 (** {1:srcfunc Source specific log functions} *)
@@ -302,22 +291,12 @@ module type LOG = sig
   (** [on_error ~level ~pp ~use r] is:
       {ul
       {- [v] if [r = `Ok v]}
-      {- [use] if [r = `Error msg]. As a side effect [msg] is logged
+      {- [use e] if [r = `Error e]. As a side effect [e] is logged
          with [pp] on level [level] (defaults to {!Logs.Error}).}} *)
-
-  val kon_error : ?level:level -> ?header:string -> ?tags:Tag.set ->
-    pp:(Format.formatter -> 'b -> unit) -> ('a, 'b) result -> ('a, 'b) result
-  (** [kon_error ~level ~pp ~use r] has the same effects as {!on_error}
-      except it always returns [r] itself. *)
 
   val on_error_msg : ?level:level -> ?header:string -> ?tags:Tag.set ->
     use:'a -> ('a, [`Msg of string]) result -> 'a
   (** [on_error_msg] is like {!on_error} but uses
-      {!Format.pp_print_text} to format the message. *)
-
-  val kon_error_msg : ?level:level -> ?header:string -> ?tags:Tag.set ->
-    ('a, [`Msg of string]) result -> ('a, [`Msg of string]) result
-  (** [kon_error_msg ~level ~pp ~use r] is like {!kon_error} but uses
       {!Format.pp_print_text} to format the message. *)
 end
 

@@ -207,19 +207,10 @@ let on_error ?src ?(level = Error) ?header ?tags ~pp ~use = function
     kmsg (fun _ -> use) ?src level "@[%a@]" @@ fun fmt ->
     fmt ?header ?tags pp e
 
-let kon_error ?src ?(level = Error) ?header ?tags ~pp = function
-| Ok _ as r -> r
-| Error e as r ->
-    kmsg (fun _ -> r) ?src level "@[%a@]" @@ fun fmt ->
-    fmt ?header ?tags pp e
-
-let pp_msg ppf (`Msg m) = Format.pp_print_string ppf m
+let pp_msg ppf (`Msg m) = Format.pp_print_text ppf m
 
 let on_error_msg ?src ?level ?header ?tags ~use =
   on_error ?src ?level ?header ?tags ~pp:pp_msg ~use
-
-let kon_error_msg ?src ?level ?header ?tags =
-  kon_error ?src ?level ?header ?tags ~pp:pp_msg
 
 (* Source specific logging functions *)
 
@@ -235,12 +226,8 @@ module type LOG = sig
     ((?header:string -> ?tags:Tag.set -> 'b) -> 'a) -> 'a
   val on_error : ?level:level -> ?header:string -> ?tags:Tag.set ->
     pp:(Format.formatter -> 'b -> unit) -> use:'a -> ('a, 'b) result -> 'a
-  val kon_error : ?level:level -> ?header:string -> ?tags:Tag.set ->
-    pp:(Format.formatter -> 'b -> unit) -> ('a, 'b) result -> ('a, 'b) result
   val on_error_msg : ?level:level -> ?header:string -> ?tags:Tag.set ->
     use:'a -> ('a, [`Msg of string]) result -> 'a
-  val kon_error_msg : ?level:level -> ?header:string -> ?tags:Tag.set ->
-    ('a, [`Msg of string]) result -> ('a, [`Msg of string]) result
 end
 
 let src_log src =
@@ -259,17 +246,8 @@ let src_log src =
         kmsg (fun _ -> use) level "@[%a@]" @@ fun fmt ->
         fmt ?header ?tags pp e
 
-    let kon_error ?(level = Error) ?header ?tags ~pp = function
-    | Ok _ as r -> r
-    | Error e as r ->
-        kmsg (fun _ -> r) level "@[%a@]" @@ fun fmt ->
-        fmt ?header ?tags pp e
-
     let on_error_msg ?level ?header ?tags ~use fmt =
       on_error ?level ?header ?tags ~pp:pp_msg ~use fmt
-
-    let kon_error_msg ?level ?header ?tags fmt =
-      kon_error ?level ?header ?tags ~pp:pp_msg fmt
   end
   in
   (module Log : LOG)
