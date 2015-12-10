@@ -16,6 +16,9 @@ val console_reporter : unit -> Logs.reporter
     browser console object} at the corresponding level and uses
     [console.log] for the [App] level.
 
+    The reporter does not process or render information about
+    message sources or tags.
+
     Consult the {{:http://caniuse.com/#search=console}browser support}. *)
 
 (*---------------------------------------------------------------------------
