@@ -22,6 +22,9 @@ val reporter :
     recommended if you are doing a simple command line tool defaults to
     [Some (Printf.sprintf "%s: " (Filename.basename Sys.argv.(0))].
 
+    The reporter does not process or render information about
+    message sources or tags.
+
     ANSI colors will be used in the output if the formatters are
     configured to do so, see {!Fmt.set_style_renderer} and
     {!Fmt_tty}. Consult a {{!Logs_cli.ex}full setup example}. *)
