@@ -216,8 +216,13 @@ val info : ?src:src -> 'a log
 val debug : ?src:src -> 'a log
 (** [debug] is [msg Debug]. *)
 
-val kmsg : (unit -> 'b) -> ?src:src -> level -> ('a, 'b) msgf -> 'b
-(** [kmsg k] is like {!msg} but calls [k] for returning. *)
+val kmsg : ?over:(unit -> unit) -> (unit -> 'b) -> ?src:src -> level ->
+  ('a, 'b) msgf -> 'b
+(** [kmsg ~over k] is like {!msg} but calls [k] for returning. If
+    [over] is specified, it is called exactly once to indicate that
+    the logging operation is over. It is unspecified whether [over] is
+    called before [k] or vice-versa and generally depends on whether
+    the message is reported and on the reporter itself. *)
 
 (** {2:result Logging [result] value [Error]s} *)
 
@@ -243,15 +248,13 @@ module type LOG = sig
   (** {1:func Log functions} *)
 
   val msg : level -> 'a log
-  (** [msg l (fun m -> m fmt ...)] logs with level [l] a message
-      formatted with [fmt]. For the semantics of levels see the
-      {{!usage}the usage conventions}. *)
+  (** See {!Logs.msg}. *)
 
   val app : 'a log
   (** [app] is [msg App]. *)
 
   val err : 'a log
-  (** [app] is [msg Error]. *)
+  (** [err] is [msg Error]. *)
 
   val warn : 'a log
   (** [warn] is [msg Warning]. *)
@@ -262,24 +265,20 @@ module type LOG = sig
   val debug : 'a log
   (** [debug] is [msg Debug]. *)
 
-  val kmsg : (unit -> 'b) -> level -> ('a, 'b) msgf -> 'b
-  (** [kmsg k] is like {!msg} but calls [k] for returning. *)
+  val kmsg : ?over:(unit -> unit) -> (unit -> 'b) -> level -> ('a, 'b) msgf
+    -> 'b
+  (** See {!Logs.kmsg}. *)
 
   (** {2:result Logging [result] value [Error]s} *)
 
   val on_error : ?level:level -> ?header:string -> ?tags:Tag.set ->
     pp:(Format.formatter -> 'b -> unit) -> use:('b -> 'a) -> ('a, 'b) result ->
     'a
-  (** [on_error ~level ~pp ~use r] is:
-      {ul
-      {- [v] if [r = `Ok v]}
-      {- [use e] if [r = `Error e]. As a side effect [e] is logged
-         with [pp] on level [level] (defaults to {!Logs.Error}).}} *)
+  (** See {!Logs.on_error}. *)
 
   val on_error_msg : ?level:level -> ?header:string -> ?tags:Tag.set ->
     use:(unit -> 'a) -> ('a, [`Msg of string]) result -> 'a
-  (** [on_error_msg] is like {!on_error} but uses
-      {!Format.pp_print_text} to format the message. *)
+  (** See {!Logs.on_error_msg}. *)
 end
 
 val src_log : src -> (module LOG)
@@ -289,18 +288,21 @@ val src_log : src -> (module LOG)
 
 type reporter =
   { report :
-    'a 'b. src -> level -> (unit -> 'b) -> ('a, 'b) msgf -> 'b }
+    'a 'b. src -> level -> over:(unit -> unit) -> (unit -> 'b) ->
+    ('a, 'b) msgf -> 'b }
 (** The type for reporters.
 
     A reporter formats and handles log messages that get
     reported. Whenever a {{!func}log function} gets called on a source
     with a level equal or smaller to the {{!Src.level}source's reporting
     level}, the {{!reporter}current reporter}'s field [r.report]
-    gets called as [r.report src level k msgf]
+    gets called as [r.report src level ~over k msgf]
     where:
     {ul
     {- [src] is the logging source.}
     {- [level] is the reporting level.}
+    {- [over] must be called by the reporter once the logging operation is
+       over from the reporter's perspective.}
     {- [k] is the function to invoke to return.}
     {- [msgf] is the {{!msgf}message formatting function} to call.}}
     See an {{!ex1}example}. *)
@@ -451,8 +453,8 @@ let run () =
   ()
 
 let reporter ppf =
-  let report src level k msgf =
-    let k _ = k () in
+  let report src level ~over k msgf =
+    let k _ = over (); k () in
     let with_stamp tags k ppf fmt =
       let stamp = match tags with
       | None -> None

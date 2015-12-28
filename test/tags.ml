@@ -22,8 +22,8 @@ let run () =
   ()
 
 let reporter ppf =
-  let report src level k msgf =
-    let k _ = k () in
+  let report src level ~over k msgf =
+    let k _ = over (); k () in
     let with_stamp tags k ppf fmt =
       let stamp = match tags with
       | None -> None

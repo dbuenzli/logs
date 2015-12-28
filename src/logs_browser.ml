@@ -23,8 +23,8 @@ let ppf, flush =
   let flush () = let s = Buffer.contents b in Buffer.clear b; s in
   Format.formatter_of_buffer b, flush
 
-let console_report src level k msgf =
-  let k _ = console level (flush ()); k () in
+let console_report src level ~over k msgf =
+  let k _ = console level (flush ()); over (); k () in
   msgf @@ fun ?header ?tags fmt ->
   match header with
   | None -> Format.kfprintf k ppf ("@[" ^^ fmt ^^ "@]@.")

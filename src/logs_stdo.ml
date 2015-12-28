@@ -9,8 +9,8 @@ let warn_style = `Yellow
 let info_style = `Blue
 let debug_style = `Green
 
-let reporter prefix dst app src level k msgf =
-  let k _ = k () in
+let reporter prefix dst app src level over k msgf =
+  let k _ = over (); k () in
   let with_header style header k ppf fmt =
     Format.kfprintf k ppf ("%s[%a] @[" ^^ fmt ^^ "@]@.") prefix
       Fmt.(styled style string) header
@@ -41,7 +41,7 @@ let reporter ?prefix ?(dst = Fmt.stderr) ?(app = Fmt.stdout)  () =
   | Some None -> ""
   | Some Some prefix -> prefix
   in
-  let report src level k = reporter prefix dst app src level k in
+  let report src level ~over k = reporter prefix dst app src level over k in
   { Logs.report = report }
 
 (*---------------------------------------------------------------------------
