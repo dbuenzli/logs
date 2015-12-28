@@ -165,13 +165,15 @@ end
 
 (* Reporters *)
 
+type ('a, 'b) msgf =
+  (?header:string -> ?tags:Tag.set ->
+   ('a, Format.formatter, unit, 'b) format4 -> 'a) -> 'b
+
 type reporter =
   { report : 'a 'b.
-      src -> level -> (unit -> 'b) ->
-      ('a, Format.formatter, unit, 'b) format4 ->
-      ((?header:string -> ?tags:Tag.set -> 'a) -> 'b) -> 'b }
+      src -> level -> (unit -> 'b) -> ('a, 'b) msgf -> 'b }
 
-let nop_reporter = { report = fun _ _ k _ _ -> k () }
+let nop_reporter = { report = fun _ _ k _ -> k () }
 let _reporter = ref nop_reporter
 let set_reporter r = _reporter := r
 let reporter () = !_reporter
@@ -183,18 +185,11 @@ let _warn_count = ref 0
 let err_count () = !_err_count
 let warn_count () = !_warn_count
 
-type 'a msgf = (?header:string -> ?tags:Tag.set -> 'a) -> unit
-type 'a log = ('a, Format.formatter, unit) format -> 'a msgf -> unit
-
-let unit_msgf ?header ?tags () = fun msg -> msg ?header ?tags
-let unit msg = msg ?header:None ?tags:None
+type 'a log = ('a, unit) msgf -> unit
 
 let kmsg :
-  'a 'b. (unit -> 'a) -> ?src:src -> level ->
-  ('b, Format.formatter, unit, 'a) format4 ->
-  ((?header:string -> ?tags:Tag.set -> 'b) -> 'a) -> 'a
-  =
-  fun k ?(src = default) level fmt msgf -> match Src.level src with
+  type a b. (unit -> b) -> ?src:src -> level -> (a, b) msgf -> b =
+  fun k ?(src = default) level msgf -> match Src.level src with
   | None -> k ()
   | Some level' when level > level' ->
       (if level = Error then incr _err_count else
@@ -203,29 +198,29 @@ let kmsg :
   | Some _ ->
       (if level = Error then incr _err_count else
        if level = Warning then incr _warn_count else ());
-      !_reporter.report src level k fmt msgf
+      !_reporter.report src level k msgf
 
 let kunit _ = ()
-let msg ?src level fmt msgf = kmsg kunit ?src level fmt msgf
-let app ?src fmt msgf = kmsg kunit ?src App fmt msgf
-let err ?src fmt msgf = kmsg kunit ?src Error fmt msgf
-let warn ?src fmt msgf = kmsg kunit ?src Warning fmt msgf
-let info ?src fmt msgf = kmsg kunit ?src Info fmt msgf
-let debug ?src fmt msgf = kmsg kunit ?src Debug fmt msgf
+let msg ?src level msgf = kmsg kunit ?src level msgf
+let app ?src msgf = kmsg kunit ?src App msgf
+let err ?src msgf = kmsg kunit ?src Error msgf
+let warn ?src msgf = kmsg kunit ?src Warning msgf
+let info ?src msgf = kmsg kunit ?src Info msgf
+let debug ?src msgf = kmsg kunit ?src Debug msgf
 
 (* Log result errors *)
 
 let on_error ?src ?(level = Error) ?header ?tags ~pp ~use = function
 | Ok v -> v
 | Error e ->
-    kmsg (fun () -> use e) ?src level "@[%a@]" @@ fun m ->
-    m ?header ?tags pp e
+    kmsg (fun () -> use e) ?src level @@ fun m ->
+    m ?header ?tags "@[%a@]" pp e
 
 let on_error_msg ?src ?(level = Error) ?header ?tags ~use = function
 | Ok v -> v
 | Error (`Msg msg) ->
-    kmsg use ?src level "@[%a@]" @@ fun m ->
-    m ?header ?tags Format.pp_print_text msg
+    kmsg use ?src level @@ fun m ->
+    m ?header ?tags "@[%a@]" Format.pp_print_text msg
 
 (* Source specific logging functions *)
 
@@ -236,27 +231,26 @@ module type LOG = sig
   val warn : 'a log
   val info : 'a log
   val debug : 'a log
-  val kmsg : (unit -> 'a) -> level ->
-    ('b, Format.formatter, unit, 'a) format4 ->
-    ((?header:string -> ?tags:Tag.set -> 'b) -> 'a) -> 'a
-
-  val on_error : ?level:level -> ?header:string -> ?tags:Tag.set ->
+  val kmsg : (unit -> 'b) -> level -> ('a, 'b) msgf -> 'b
+  val on_error :
+    ?level:level -> ?header:string -> ?tags:Tag.set ->
     pp:(Format.formatter -> 'b -> unit) -> use:('b -> 'a) -> ('a, 'b) result ->
     'a
 
-  val on_error_msg : ?level:level -> ?header:string -> ?tags:Tag.set ->
+  val on_error_msg :
+    ?level:level -> ?header:string -> ?tags:Tag.set ->
     use:(unit -> 'a) -> ('a, [`Msg of string]) result -> 'a
 end
 
 let src_log src =
   let module Log = struct
-    let msg level fmt msgf = msg ~src level fmt msgf
-    let kmsg k level fmt msgf = kmsg k ~src level fmt msgf
-    let app fmt msgf = msg App fmt msgf
-    let err fmt msgf = msg Error fmt msgf
-    let warn fmt msgf = msg Warning fmt msgf
-    let info fmt msgf = msg Info fmt msgf
-    let debug fmt msgf = msg Debug fmt msgf
+    let msg level msgf = msg ~src level msgf
+    let kmsg k level msgf = kmsg k ~src level msgf
+    let app msgf = msg App msgf
+    let err msgf = msg Error msgf
+    let warn msgf = msg Warning msgf
+    let info msgf = msg Info msgf
+    let debug msgf = msg Debug msgf
     let on_error ?level ?header ?tags ~pp ~use =
       on_error ~src ?level ?header ?tags ~pp ~use
 

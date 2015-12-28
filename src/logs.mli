@@ -176,28 +176,23 @@ module Tag : sig
   (** [pp_set ppf s] prints an unspecified representation of s on [ppf]. *)
 end
 
-type 'a msgf = (?header:string -> ?tags:Tag.set -> 'a) -> unit
+type ('a, 'b) msgf =
+  (?header:string -> ?tags:Tag.set ->
+   ('a, Format.formatter, unit, 'b) format4 -> 'a) -> 'b
 (** The type for message formatting functions.
 
     Message formatting functions are called with a message
     construction function whenever a message needs to be reported. The
     message formatting function must call the given message
-    construction function with the arguments of the message. The
-    arguments of the message are defined by the format string of the
-    log function see {!log} for examples. The optional arguments of the message
-    construction function are:
+    construction function with a format string and its arguments to
+    define the message contents, see {!log} for examples. The optional
+    arguments of the message construction function are:
     {ul
     {- [header], an optional printable message header. Default to [None].}
     {- [tags], a set of tags to attach to the message. Defaults
        {!Tag.empty}.}} *)
 
-val unit_msgf : ?header:string -> ?tags:Tag.set -> unit -> unit msgf
-(** [unit_msgf ?header ?tags ()] is [(fun m -> m ?header ?tags)]. *)
-
-val unit : unit msgf
-(** [unit] is {!unit_msgf}[ ()]. *)
-
-type 'a log = ('a, Format.formatter, unit) format -> 'a msgf -> unit
+type 'a log = ('a, unit) msgf -> unit
 (** The type for log functions.
 
     For minimizing the overhead whenever the message is not reported,
@@ -205,25 +200,14 @@ type 'a log = ('a, Format.formatter, unit) format -> 'a msgf -> unit
     {{!msgf}message formatting function}. This leads to the following
     logging structure:
 {[
-Logs.err "invalid key value pair (%a,%a)"
-  (fun m -> m pp_key key pp_val value);
+Logs.err (fun m -> m "invalid kv pair (%a,%a)" pp_key key pp_val value);
 ]}
-    The pattern is quite simple: it is as if you were formatting as
-    usual except you need to interpose the function with the [m]
-    argument standing for the format string. If your format string has no
-    directives, the type system will annoy you with the formatting function
-    because of the optional arguments. You have to write:
-{[
-Logs.err "You are doomed!" (fun m -> m ?header:None ?tags:None);
-]}
-    To avoid this [Logs] provides the constant formatter {!Logs.unit}
-    so that you can simply write:
-{[
-Logs.err "You are doomed!" Logs.unit;
-]} *)
+    The pattern is quite simple: it is as if you were formatting using
+    a [printf]-like function exception you get this function
+    in the [m] argument of the function. *)
 
 val msg : ?src:src -> level -> 'a log
-(** [msg ?src l fmt (fun m -> m ...)] logs with level [l] on the source
+(** [msg ?src l (fun m -> m fmt ...)] logs with level [l] on the source
     [src] (defaults to {!default}) a message formatted with [fmt]. For the
     semantics of levels see the {{!usage}the usage conventions}. *)
 
@@ -242,9 +226,7 @@ val info : ?src:src -> 'a log
 val debug : ?src:src -> 'a log
 (** [debug] is [msg Debug]. *)
 
-val kmsg : (unit -> 'a) -> ?src:src -> level ->
-  ('b, Format.formatter, unit, 'a) format4 ->
-  ((?header:string -> ?tags:Tag.set -> 'b) -> 'a) -> 'a
+val kmsg : (unit -> 'b) -> ?src:src -> level -> ('a, 'b) msgf -> 'b
 (** [kmsg k] is like {!msg} but calls [k] for returning. *)
 
 (** {2:result Logging [result] value [Error]s} *)
@@ -271,7 +253,7 @@ module type LOG = sig
   (** {1:func Log functions} *)
 
   val msg : level -> 'a log
-  (** [msg l fmt (fun m -> m ...)] logs with level [l] a message
+  (** [msg l (fun m -> m fmt ...)] logs with level [l] a message
       formatted with [fmt]. For the semantics of levels see the
       {{!usage}the usage conventions}. *)
 
@@ -290,9 +272,7 @@ module type LOG = sig
   val debug : 'a log
   (** [debug] is [msg Debug]. *)
 
-  val kmsg : (unit -> 'a) -> level ->
-    ('b, Format.formatter, unit, 'a) format4 ->
-    ((?header:string -> ?tags:Tag.set -> 'b) -> 'a) -> 'a
+  val kmsg : (unit -> 'b) -> level -> ('a, 'b) msgf -> 'b
   (** [kmsg k] is like {!msg} but calls [k] for returning. *)
 
   (** {2:result Logging [result] value [Error]s} *)
@@ -318,22 +298,20 @@ val src_log : src -> (module LOG)
 (** {1:reporters Reporters} *)
 
 type reporter =
-  { report : 'a 'b. src -> level ->
-      (unit -> 'b) -> ('a, Format.formatter, unit, 'b) format4 ->
-      ((?header:string -> ?tags:Tag.set -> 'a) -> 'b) -> 'b }
+  { report :
+    'a 'b. src -> level -> (unit -> 'b) -> ('a, 'b) msgf -> 'b }
 (** The type for reporters.
 
     A reporter formats and handles log messages that get
     reported. Whenever a {{!func}log function} gets called on a source
     with a level equal or smaller to the {{!Src.level}source's reporting
     level}, the {{!reporter}current reporter}'s field [r.report]
-    gets called as [r.report src level k fmt msgf]
+    gets called as [r.report src level k msgf]
     where:
     {ul
     {- [src] is the logging source.}
     {- [level] is the reporting level.}
     {- [k] is the function to invoke to return.}
-    {- [fmt] is the message format string.}
     {- [msgf] is the {{!msgf}message formatting function} to call.}}
     See an {{!ex1}example}. *)
 
@@ -437,19 +415,19 @@ let stamp c = Logs.Tag.(empty |> add stamp_tag (Mtime.count c))
 let run () =
   let rec wait n = if n = 0 then () else wait (n - 1) in
   let c = Mtime.counter () in
-  Logs.info "Starting run" Logs.unit;
+  Logs.info (fun m -> m "Starting run");
   let delay1, delay2, delay3 = 10_000, 20_000, 40_000 in
-  Logs.info "Start action 1 (%d)." (fun m -> m ~tags:(stamp c) delay1);
+  Logs.info (fun m -> m "Start action 1 (%d)." delay1 ~tags:(stamp c));
   wait delay1;
-  Logs.info "Start action 2 (%d)." (fun m -> m ~tags:(stamp c) delay2);
+  Logs.info (fun m -> m "Start action 2 (%d)." delay2 ~tags:(stamp c));
   wait delay2;
-  Logs.info "Start action 3 (%d)." (fun m -> m ~tags:(stamp c) delay3);
+  Logs.info (fun m -> m "Start action 3 (%d)." delay3 ~tags:(stamp c));
   wait delay3;
-  Logs.info "Done." (fun m -> m ?header:None ~tags:(stamp c));
+  Logs.info (fun m -> m "Done." ?header:None ~tags:(stamp c));
   ()
 
 let reporter ppf =
-  let report src level k fmt msgf =
+  let report src level k msgf =
     let k _ = k () in
     let with_stamp tags k ppf fmt =
       let stamp = match tags with
@@ -459,7 +437,7 @@ let reporter ppf =
       let dt = match stamp with None -> 0. | Some s -> (Mtime.to_us s) in
       Format.kfprintf k ppf ("[%0+04.0fus] @[" ^^ fmt ^^ "@]@.") dt
     in
-    msgf @@ fun ?header ?tags -> with_stamp tags k ppf fmt
+    msgf @@ fun ?header ?tags fmt -> with_stamp tags k ppf fmt
   in
   { Logs.report = report }
 

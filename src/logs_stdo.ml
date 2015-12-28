@@ -9,13 +9,13 @@ let warn_style = `Yellow
 let info_style = `Blue
 let debug_style = `Green
 
-let reporter prefix dst app src level k fmt msgf =
+let reporter prefix dst app src level k msgf =
   let k _ = k () in
   let with_header style header k ppf fmt =
     Format.kfprintf k ppf ("%s[%a] @[" ^^ fmt ^^ "@]@.") prefix
       Fmt.(styled style string) header
   in
-  msgf @@ fun ?header ?tags ->
+  msgf @@ fun ?header ?tags fmt ->
   match level with
   | Logs.App ->
       begin match header with
@@ -41,7 +41,7 @@ let reporter ?prefix ?(dst = Fmt.stderr) ?(app = Fmt.stdout)  () =
   | Some None -> ""
   | Some Some prefix -> prefix
   in
-  let report src level k fmt = reporter prefix dst app src level k fmt in
+  let report src level k = reporter prefix dst app src level k in
   { Logs.report = report }
 
 (*---------------------------------------------------------------------------

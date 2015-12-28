@@ -32,7 +32,6 @@ val level : ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
     absent can be overridden by the corresponding environment
     variable. *)
 
-
 (** {1:ex Example}
 
     The following example shows how to setup {!Logs} and {!Fmt} so
@@ -40,7 +39,7 @@ val level : ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
     if these are [tty]s. The command line interface provides options
     to control the use of colors and the log reporting level.
 {[
-let hello () = Logs.app "Hello horrible world!" Logs.unit
+let hello () = Logs.app (fun m -> m "Hello horrible world!")
 
 let setup_log style_renderer level =
   Fmt_tty.setup_std_outputs ?style_renderer ();

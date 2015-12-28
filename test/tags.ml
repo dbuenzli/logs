@@ -10,19 +10,19 @@ let stamp c = Logs.Tag.(empty |> add stamp_tag (Mtime.count c))
 let run () =
   let rec wait n = if n = 0 then () else wait (n - 1) in
   let c = Mtime.counter () in
-  Logs.info "Starting run" Logs.unit;
+  Logs.info (fun m -> m "Starting run");
   let delay1, delay2, delay3 = 10_000, 20_000, 40_000 in
-  Logs.info "Start action 1 (%d)." (fun m -> m ~tags:(stamp c) delay1);
+  Logs.info (fun m -> m "Start action 1 (%d)." delay1 ~tags:(stamp c));
   wait delay1;
-  Logs.info "Start action 2 (%d)." (fun m -> m ~tags:(stamp c) delay2);
+  Logs.info (fun m -> m "Start action 2 (%d)." delay2 ~tags:(stamp c));
   wait delay2;
-  Logs.info "Start action 3 (%d)." (fun m -> m ~tags:(stamp c) delay3);
+  Logs.info (fun m -> m "Start action 3 (%d)." delay3 ~tags:(stamp c));
   wait delay3;
-  Logs.info "Done." (fun m -> m ?header:None ~tags:(stamp c));
+  Logs.info (fun m -> m "Done." ?header:None ~tags:(stamp c));
   ()
 
 let reporter ppf =
-  let report src level k fmt msgf =
+  let report src level k msgf =
     let k _ = k () in
     let with_stamp tags k ppf fmt =
       let stamp = match tags with
@@ -32,7 +32,7 @@ let reporter ppf =
       let dt = match stamp with None -> 0. | Some s -> (Mtime.to_us s) in
       Format.kfprintf k ppf ("[%0+04.0fus] @[" ^^ fmt ^^ "@]@.") dt
     in
-    msgf @@ fun ?header ?tags -> with_stamp tags k ppf fmt
+    msgf @@ fun ?header ?tags fmt -> with_stamp tags k ppf fmt
   in
   { Logs.report = report }
 

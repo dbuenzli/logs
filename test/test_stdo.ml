@@ -8,12 +8,12 @@ let main () =
   Fmt_tty.setup_std_outputs ();
   Logs.set_level @@ Some Logs.Debug;
   Logs.set_reporter @@ Logs_stdo.reporter ();
-  Logs.info "Starting main" (fun msg -> msg ~header:"START" ?tags:None);
-  Logs.warn "Hey be warned by %d." (fun msg -> msg 7);
-  Logs.err "Hey be errored." Logs.unit;
-  Logs.debug "Would you mind to be debugged a bit ?" Logs.unit;
-  Logs.app "This is for the application console or stdout." Logs.unit;
-  Logs.info "Ending main" Logs.unit;
+  Logs.info (fun m -> m ~header:"START" ?tags:None "Starting main");
+  Logs.warn (fun m -> m "Hey be warned by %d." 7);
+  Logs.err (fun m -> m "Hey be errored.");
+  Logs.debug (fun m -> m "Would you mind to be debugged a bit ?");
+  Logs.app (fun m -> m "This is for the application console or stdout.");
+  Logs.info (fun m -> m "Ending main");
   exit (if (Logs.err_count () > 0) then 1 else 0)
 
 let () = main ()

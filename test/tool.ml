@@ -2,7 +2,7 @@
 
 (* Example setup for a simple command line tool with colorful output. *)
 
-let hello () = Logs.app "Hello horrible world!" Logs.unit
+let hello () = Logs.app (fun m -> m "Hello horrible world!")
 
 (* Command line interface *)
 
