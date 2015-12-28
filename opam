@@ -13,7 +13,7 @@ depends: [
   "ocamlbuild" {build}
   "mtime" {test}
   "result" ]
-depopts: [ "js_of_ocaml" "fmt" "cmdliner" ]
+depopts: [ "js_of_ocaml" "fmt" "cmdliner" "lwt" ]
 build:
 [
   [ "ocaml" "pkg/git.ml" ]
@@ -21,5 +21,7 @@ build:
                            "native-dynlink=%{ocaml-native-dynlink}%"
                            "jsoo=%{js_of_ocaml:installed}%"
                            "fmt=%{fmt:installed}%"
-                           "cmdliner=%{cmdliner:installed}%" ]
+                           "cmdliner=%{cmdliner:installed}%"
+                           "lwt=%{lwt:installed}%"
+ ]
 ]

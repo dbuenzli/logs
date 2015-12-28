@@ -3,3 +3,4 @@ tool.native
 tags.native
 test_browser.html
 test_browser.byte
+test_lwt.native

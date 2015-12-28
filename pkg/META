@@ -41,6 +41,17 @@ package "cli" (
   exists_if = "logs_cli.cma"
 )
 
+package "lwt" (
+  description = "Lwt support for Logs"
+  version = "%%VERSION%%"
+  requires = "logs lwt"
+  archive(byte) = "logs_lwt.cma"
+  archive(byte, plugin) = "logs_lwt.cma"
+  archive(native) = "logs_lwt.cmxa"
+  archive(native, plugin) = "logs_lwt.cmxs"
+  exists_if = "logs_lwt.cma"
+)
+
 package "top" (
   description = "Logs toplevel support"
   version = "%%VERSION%%"

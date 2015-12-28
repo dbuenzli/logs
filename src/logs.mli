@@ -219,10 +219,11 @@ val debug : ?src:src -> 'a log
 val kmsg : ?over:(unit -> unit) -> (unit -> 'b) -> ?src:src -> level ->
   ('a, 'b) msgf -> 'b
 (** [kmsg ~over k] is like {!msg} but calls [k] for returning. If
-    [over] is specified, it is called exactly once to indicate that
-    the logging operation is over. It is unspecified whether [over] is
-    called before [k] or vice-versa and generally depends on whether
-    the message is reported and on the reporter itself. *)
+    [over] is specified, it is always called exactly once to indicate
+    that the logging operation is over. It is unspecified whether
+    [over] is called before [k] or vice-versa: this generally depends
+    on whether the message is reported or not and on the reporter
+    itself. *)
 
 (** {2:result Logging [result] value [Error]s} *)
 
