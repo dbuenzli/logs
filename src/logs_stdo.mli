@@ -31,6 +31,18 @@ val reporter :
 
 (** {1:cheader Colored message headers} *)
 
+val err_style : Fmt.style
+(** [err_style] is the style used to render headers at error level. *)
+
+val warn_style : Fmt.style
+(** [warn_style] is the style used to render headers at warning level. *)
+
+val info_style : Fmt.style
+(** [info_style] is the style used to render headers at info level. *)
+
+val debug_style : Fmt.style
+(** [debug_style] is the style used to render headers at debug level. *)
+
 val pp_header : Format.formatter -> (Logs.level * string option) -> unit
 (** [pp_header] is like {!Logs.pp_header} but may use ANSI colors if the
     formatter is configured to do so, see {!Fmt.set_style_renderer} and
