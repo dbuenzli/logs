@@ -179,32 +179,22 @@ end
 type ('a, 'b) msgf =
   (?header:string -> ?tags:Tag.set ->
    ('a, Format.formatter, unit, 'b) format4 -> 'a) -> 'b
-(** The type for message formatting functions.
+(** The type for client specified message formatting functions.
 
     Message formatting functions are called with a message
     construction function whenever a message needs to be reported. The
     message formatting function must call the given message
     construction function with a format string and its arguments to
-    define the message contents, see {!log} for examples. The optional
-    arguments of the message construction function are:
+    define the message contents, see the {{!logging}basics} for examples.
+    The optional arguments of the message construction function are:
     {ul
     {- [header], an optional printable message header. Default to [None].}
     {- [tags], a set of tags to attach to the message. Defaults
        {!Tag.empty}.}} *)
 
 type 'a log = ('a, unit) msgf -> unit
-(** The type for log functions.
-
-    For minimizing the overhead whenever the message is not reported,
-    message formatting only occurs on actual message report via the
-    {{!msgf}message formatting function}. This leads to the following
-    logging structure:
-{[
-Logs.err (fun m -> m "invalid kv pair (%a,%a)" pp_key key pp_val value);
-]}
-    The pattern is quite simple: it is as if you were formatting using
-    a [printf]-like function exception you get this function
-    in the [m] argument of the function. *)
+(** The type for log functions. See the {{!logging}basics} to understand
+    how to use log functions. *)
 
 val msg : ?src:src -> level -> 'a log
 (** [msg ?src l (fun m -> m fmt ...)] logs with level [l] on the source
@@ -337,6 +327,45 @@ val warn_count : unit -> int
 
 (** {1:basics Basics}
 
+    {2:logging Logging}
+
+    In order to minimize the overhead whenever a log message is not reported,
+    message formatting only occurs on actual message report via the
+    {{!msgf}message formatting function} you provide to log functions. This
+    leads to the following logging structure:
+{[
+let k, v = ... in
+Logs.err (fun m -> m "invalid kv (%a,%a)" pp_key k pp_val v);
+Logs.err (fun m -> m "NO CARRIER");
+]}
+    The pattern is quite simple: it is as if you were formatting with
+    a [printf]-like function except you get this function in the [m]
+    argument of the function you give to the logging function.
+
+    If you want to abstract a repeated log report it is better to keep
+    the message formatting function structure for the arguments of the
+    messages. Here's how the above examples can be abstracted and
+    invoked:
+{[
+let err_invalid_kv args =
+  Logs.err @@ fun m ->
+  args (fun k v -> m "invalid kv (%a,%a)" pp_key k pp_val v)
+
+let err_no_carrier args =
+  Logs.err @@ fun m -> args (m "NO CARRIER")
+
+let () =
+  err_invalid_kv @@ fun args -> args "key" "value";
+  err_no_carrier @@ fun () -> ();
+  ()
+]}
+    Note that log messages are formatted and hit the reporter only if
+    they have not been filtered out by the current
+    {{!Src.level}reporting level} of the source you log on. See also
+    the log source and reporting level {{!usage}usage conventions}.
+
+    {2:setupreporter Reporter setup}
+
     If you are writing an application you must remember to
     {{!set_reporter}set} the reporter before any logging operation
     takes place otherwise no messages will be reported. For example if
@@ -352,17 +381,12 @@ let main () =
     If you have logging code that is performed in the toplevel
     initialization code of modules (not a good idea) or you depend on
     (bad) libraries that do so, you must call and link the reporter
-    install code before these initialization bits are being
-    executed otherwise you will miss these messages.
+    install code before these initialization bits are being executed
+    otherwise you will miss these messages.
 
     The documentation of {!Logs_cli} module has a {{!Logs_cli.ex}full setup
     example} that includes command line options to control color and log
     reporting level.
-
-    The basics for using the logging functions is explained
-    {{!log}here}. Note that log messages hit the reporter and
-    are formatted only if they have not been filtered out by the current
-    {{!Src.level}reporting level} of the source you log on.
 
     If you are writing a library you should neither install reporters, nor
     set the reporting level of sources, nor log on the {!default} source or
