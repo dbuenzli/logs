@@ -40,6 +40,10 @@ val set_level : ?all:bool -> level option -> unit
     {!Src.set_level} to only affect a specific source. Only applications
     should use this function directly see {{!usage}usage conventions}. *)
 
+val pp_level : Format.formatter -> level -> unit
+(** [pp_level ppf l] prints an unspecified representation of [l] on
+    [ppf]. *)
+
 type src
 (** The type for log sources. A source defines a named unit of logging
     whose reporting level can be set independently. *)
@@ -318,6 +322,10 @@ val reporter : unit -> reporter
 val set_reporter : reporter -> unit
 (** [set_reporter r] sets the current reporter to [r]. *)
 
+val pp_header : Format.formatter -> (level * string option) -> unit
+(** [pp_header ppf (l, h)] prints an unspecified representation
+    of log header [h] for level [l]. *)
+
 (** {1:monitoring Logs monitoring} *)
 
 val err_count : unit -> int
@@ -456,15 +464,16 @@ let run () =
 let reporter ppf =
   let report src level ~over k msgf =
     let k _ = over (); k () in
-    let with_stamp tags k ppf fmt =
+    let with_stamp h tags k ppf fmt =
       let stamp = match tags with
       | None -> None
       | Some tags -> Logs.Tag.find stamp_tag tags
       in
       let dt = match stamp with None -> 0. | Some s -> (Mtime.to_us s) in
-      Format.kfprintf k ppf ("[%0+04.0fus] @[" ^^ fmt ^^ "@]@.") dt
+      Format.kfprintf k ppf ("%a[%0+04.0fus] @[" ^^ fmt ^^ "@]@.") dt
+        Logs.pp_header (level, h) dt
     in
-    msgf @@ fun ?header ?tags fmt -> with_stamp tags k ppf fmt
+    msgf @@ fun ?header ?tags fmt -> with_stamp header tags k ppf fmt
   in
   { Logs.report = report }
 
@@ -479,16 +488,16 @@ let () = main ()
 ]}
 Here is the standard output of a sample run of the program:
 {v
-[+000us] Starting run
-[+101us] Start action 1 (10000).
-[+122us] Start action 2 (20000).
-[+140us] Start action 3 (40000).
-[+172us] Done.
-[+000us] Starting run
-[+004us] Start action 1 (10000).
-[+017us] Start action 2 (20000).
-[+050us] Start action 3 (40000).
-[+082us] Done.
+[INFO][+000us] Starting run
+[INFO][+168us] Start action 1 (10000).
+[INFO][+206us] Start action 2 (20000).
+[INFO][+243us] Start action 3 (40000).
+[INFO][+303us] Done.
+[INFO][+000us] Starting run
+[INFO][+012us] Start action 1 (10000).
+[INFO][+038us] Start action 2 (20000).
+[INFO][+074us] Start action 3 (40000).
+[INFO][+133us] Done.
 v}
 
 *)

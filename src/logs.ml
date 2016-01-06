@@ -13,6 +13,12 @@ let strf = Format.asprintf
 type level = App | Error | Warning | Info | Debug
 let _level = ref (Some Warning)
 let level () = !_level
+let pp_level ppf = function
+| App -> ()
+| Error -> Format.pp_print_string ppf "ERROR"
+| Warning -> Format.pp_print_string ppf "WARNING"
+| Info -> Format.pp_print_string ppf "INFO"
+| Debug -> Format.pp_print_string ppf "DEBUG"
 
 (* Sources *)
 
@@ -178,6 +184,10 @@ let nop_reporter = { report = fun _ _ ~over k _ -> over (); k () }
 let _reporter = ref nop_reporter
 let set_reporter r = _reporter := r
 let reporter () = !_reporter
+
+let pp_header ppf (l, h) = match h with
+| None -> if l = App then () else Format.fprintf ppf "[%a]" pp_level l
+| Some h -> Format.fprintf ppf "[%s]" h
 
 (* Log functions *)
 

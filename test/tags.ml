@@ -24,15 +24,16 @@ let run () =
 let reporter ppf =
   let report src level ~over k msgf =
     let k _ = over (); k () in
-    let with_stamp tags k ppf fmt =
+    let with_stamp h tags k ppf fmt =
       let stamp = match tags with
       | None -> None
       | Some tags -> Logs.Tag.find stamp_tag tags
       in
       let dt = match stamp with None -> 0. | Some s -> (Mtime.to_us s) in
-      Format.kfprintf k ppf ("[%0+04.0fus] @[" ^^ fmt ^^ "@]@.") dt
+      Format.kfprintf k ppf ("%a[%0+04.0fus] @[" ^^ fmt ^^ "@]@.")
+        Logs.pp_header (level, h) dt
     in
-    msgf @@ fun ?header ?tags fmt -> with_stamp tags k ppf fmt
+    msgf @@ fun ?header ?tags fmt -> with_stamp header tags k ppf fmt
   in
   { Logs.report = report }
 
