@@ -44,6 +44,23 @@ let reporter ?prefix ?(dst = Fmt.stderr) ?(app = Fmt.stdout)  () =
   let report src level ~over k = reporter prefix dst app src level over k in
   { Logs.report = report }
 
+let pp_header ppf (l, h) =
+  let pp_h ppf style h = Fmt.(pf ppf "[%a]" (styled style string) h) in
+  match l with
+  | Logs.App ->
+      begin match h with
+      | None -> ()
+      | Some h -> Format.fprintf ppf "[%s]" h
+      end
+  | Logs.Error ->
+      pp_h ppf err_style (match h with None -> "ERROR" | Some h -> h)
+  | Logs.Warning ->
+      pp_h ppf err_style (match h with None -> "WARNING" | Some h -> h)
+  | Logs.Info ->
+      pp_h ppf err_style (match h with None -> "INFO" | Some h -> h)
+  | Logs.Debug ->
+      pp_h ppf err_style (match h with None -> "DEBUG" | Some h -> h)
+
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli.
    All rights reserved.

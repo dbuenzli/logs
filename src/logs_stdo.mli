@@ -6,9 +6,9 @@
 
 (** Standard outputs reporter for {!Logs}.
 
-    {e Release %%VERSION%% - %%MAINTAINER%% }
+    {e Release %%VERSION%% - %%MAINTAINER%% } *)
 
-    {1 Reporter} *)
+(** {1 Reporter} *)
 
 val reporter :
   ?prefix:string option ->
@@ -28,6 +28,13 @@ val reporter :
     ANSI colors will be used in the output if the formatters are
     configured to do so, see {!Fmt.set_style_renderer} and
     {!Fmt_tty}. Consult a {{!Logs_cli.ex}full setup example}. *)
+
+(** {1:cheader Colored message headers} *)
+
+val pp_header : Format.formatter -> (Logs.level * string option) -> unit
+(** [pp_header] is like {!Logs.pp_header} but may use ANSI colors if the
+    formatter is configured to do so, see {!Fmt.set_style_renderer} and
+    {!Fmt_tty}. *)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli.
