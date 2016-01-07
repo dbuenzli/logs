@@ -14,13 +14,15 @@ optional `Logs_fmt` reporter on OCaml formatters depends on [Fmt][1].
 The optional `Logs_browser` reporter that reports to the web browser
 console depends on [js_of_ocaml][2]. The optional `Logs_cli` library
 that provides command line support for controlling Logs depends on
-[`Cmdliner`][3].
+[`Cmdliner`][3]. The optional `Logs_lwt` library that provides Lwt logging
+functions depends on [`Lwt`][4]
 
 Logs and its reporters are distributed under the BSD3 license.
 
 [1]: http://ocsigen.org/js_of_ocaml/
 [2]: http://erratique.ch/software/fmt
 [3]: http://erratique.ch/software/cmdliner
+[4]: http://ocsigen.org/lwt/
 
 Home page: http://erratique.ch/software/logs  
 Contact: Daniel Bünzli `<daniel.buenzl i@erratique.ch>`
@@ -30,7 +32,7 @@ Contact: Daniel Bünzli `<daniel.buenzl i@erratique.ch>`
 Logs can be installed with `opam`:
 
     opam install logs
-    opam install fmt cmdliner js_of_ocaml logs # Install all optional libraries
+    opam install fmt cmdliner lwt js_of_ocaml logs # Install all opt libraries
 
 If you don't use `opam` consult the [`opam`](opam) file for build
 instructions.
