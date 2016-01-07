@@ -18,7 +18,7 @@ let err_no_carrier args =
 let main () =
   Fmt_tty.setup_std_outputs ();
   Logs.set_level @@ Some Logs.Debug;
-  Logs.set_reporter @@ Logs_stdo.reporter ();
+  Logs.set_reporter @@ Logs_fmt.reporter ();
   Logs.info (fun m -> m ~header:"START" ?tags:None "Starting main");
   Logs.warn (fun m -> m "Hey be warned by %d." 7);
   Logs.err (fun m -> m "Hey be errored.");

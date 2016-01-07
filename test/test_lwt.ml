@@ -9,7 +9,7 @@ let ( >>= ) = Lwt.bind
 let main () =
   Fmt_tty.setup_std_outputs ();
   Logs.set_level @@ Some Logs.Debug;
-  Logs.set_reporter @@ Logs_stdo.reporter ();
+  Logs.set_reporter @@ Logs_fmt.reporter ();
   Lwt_main.run @@ begin
     Logs_lwt.info (fun m -> m ~header:"START" ?tags:None "Starting main")
     >>= fun () -> Logs_lwt.warn (fun m -> m "Hey be warned by %d." 7)

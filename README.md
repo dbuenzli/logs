@@ -10,7 +10,7 @@ A few optional log reporters are distributed with the base library and
 the API easily allows to implement your own.
 
 `Logs` depends only on the `result` compatibility package. The
-optional `Logs_stdo` reporter on standard outputs depends on [Fmt][1].
+optional `Logs_fmt` reporter on OCaml formatters depends on [Fmt][1].
 The optional `Logs_browser` reporter that reports to the web browser
 console depends on [js_of_ocaml][2]. The optional `Logs_cli` library
 that provides command line support for controlling Logs depends on

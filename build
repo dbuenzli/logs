@@ -12,7 +12,7 @@ action ()
     case $1 in
         default) action lib;;
         lib) $OCAMLBUILD logs.cma logs.cmxa \
-                         logs_stdo.cma logs_stdo.cmxa \
+                         logs_fmt.cma logs_fmt.cmxa \
                          logs_browser.cma logs_browser.cmxa \
                          logs_cli.cma logs_cli.cmxa \
                          logs_top.cma logs_top.cmxa ;;

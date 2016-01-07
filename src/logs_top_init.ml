@@ -6,7 +6,7 @@
 
 let () =
   Logs.set_level (Some Logs.Debug);
-  Logs.set_reporter (Logs_stdo.reporter ());
+  Logs.set_reporter (Logs_fmt.reporter ());
   ()
 
 (*---------------------------------------------------------------------------

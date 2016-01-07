@@ -1,4 +1,4 @@
-test_stdo.native
+test_fmt.native
 tool.native
 tags.native
 test_browser.html

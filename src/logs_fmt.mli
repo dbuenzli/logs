@@ -4,7 +4,10 @@
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-(** Standard outputs reporter for {!Logs}.
+(** {!Format} reporter for {!Logs}.
+
+    Reports message using two formatters. One for {!Logs.App}
+    level message and the other one for the other levels.
 
     {e Release %%VERSION%% - %%MAINTAINER%% } *)
 

@@ -8,15 +8,15 @@ archive(native) = "logs.cmxa"
 archive(native, plugin) = "logs.cmxs"
 exists_if = "logs.cma"
 
-package "stdo" (
-  description = "Standard outputs reporter for Logs"
+package "fmt" (
+  description = "Format reporter for Logs"
   version = "%%VERSION%%"
   requires = "logs fmt"
-  archive(byte) = "logs_stdo.cma"
-  archive(byte, plugin) = "logs_stdo.cma"
-  archive(native) = "logs_stdo.cmxa"
-  archive(native, plugin) = "logs_stdo.cmxs"
-  exists_if = "logs_stdo.cma"
+  archive(byte) = "logs_fmt.cma"
+  archive(byte, plugin) = "logs_fmt.cma"
+  archive(native) = "logs_fmt.cmxa"
+  archive(native, plugin) = "logs_fmt.cmxs"
+  exists_if = "logs_fmt.cma"
 )
 
 package "browser" (
@@ -44,7 +44,7 @@ package "cli" (
 package "lwt" (
   description = "Lwt support for Logs"
   version = "%%VERSION%%"
-  requires = "logs lwt"
+  requires = "logs fmt logs.stdo lwt"
   archive(byte) = "logs_lwt.cma"
   archive(byte, plugin) = "logs_lwt.cma"
   archive(native) = "logs_lwt.cmxa"

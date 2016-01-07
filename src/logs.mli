@@ -380,11 +380,11 @@ let () =
     If you are writing an application you must remember to
     {{!set_reporter}set} the reporter before any logging operation
     takes place otherwise no messages will be reported. For example if
-    you are using the {{!Logs_stdo}standard outputs reporter}, logging
+    you are using the {{!Logs_fmt}formatter reporter}, logging
     can be setup as follows:
 {[
 let main () =
-  Logs.set_reporter (Logs_stdo.reporter ());
+  Logs.set_reporter (Logs_fmt.reporter ());
   ...
   exit (if Logs.err_count > 0 then 1 else 0);
   ()
