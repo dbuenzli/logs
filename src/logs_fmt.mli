@@ -15,22 +15,31 @@
 
 val reporter :
   ?prefix:string option ->
-  ?dst:Format.formatter ->
-  ?app:Format.formatter -> unit -> Logs.reporter
-(** [reporter ~prefix ~dst ~app ()] is a reporter that reports {!Logs.App}
+  ?app:Format.formatter ->
+  ?dst:Format.formatter -> unit -> Logs.reporter
+(** [reporter ~prefix ~app ~dst ()] is a reporter that reports {!Logs.App}
     level messages on [app] (defaults to {!Format.std_formatter}) and
     all other levels on [dst] (defaults to {!Format.err_formatter}).
 
     If [prefix] is [Some pre] messages on [dst] are prefixed by [pre] which is
-    recommended if you are doing a simple command line tool defaults to
-    [Some (Printf.sprintf "%s: " (Filename.basename Sys.executable_name)].
-
+    recommended if you are doing a simple command line tool defaults to:
+{[
+Some (Printf.sprintf "%s: " @@ Filename.basename Sys.executable_name)
+]}
     The reporter does not process or render information about
     message sources or tags.
 
     ANSI colors will be used in the output if the formatters are
     configured to do so, see {!Fmt.set_style_renderer} and
-    {!Fmt_tty}. Consult a {{!Logs_cli.ex}full setup example}. *)
+    {!Fmt_tty}. Consult a {{!Logs_cli.ex}full setup example}.
+
+    {b Important.} This is a synchronous reporter it considers the log
+    operation to be over once the message was formatted and before
+    calling the continution (see the {{!Logs.sync}note on synchronous
+    logging}). In particular if the formatters are baked by channels,
+    it will block until the message has been formatted on the channel
+    before proceeding which may not be suitable in a cooperative
+    concurrency setting like {!Lwt}. *)
 
 (** {1:cheader Colored message headers} *)
 

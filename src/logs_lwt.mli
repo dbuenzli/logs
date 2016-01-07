@@ -4,20 +4,23 @@
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-(** {!Lwt} support.
+(** {!Lwt} logging.
+
+    The log functions of this module return [Lwt] threads that proceed
+    only when the log operation is over, as defined by the current
+    {!Logs.reporter}.
+
+    See a {{!report_ex}cooperative reporter example}.
 
     {e Release %%VERSION%% - %%MAINTAINER%% } *)
-
 
 (** {1 Log functions} *)
 
 open Result
 
 type 'a log = ('a, unit Lwt.t) Logs.msgf -> unit Lwt.t
-(** The type for Lwt log functions. See {!Logs.log}.
-
-    The returned thread only proceeds once the log operation is over
-    (see {!Logs.kmsg}). *)
+(** The type for Lwt log functions. The returned thread only proceeds
+    once the log operation is over. See {!Logs.log}. *)
 
 val msg : ?src:Logs.src -> Logs.level -> 'a log
 (** See {!Logs.msg}. *)
@@ -92,7 +95,43 @@ module type LOG = sig
 end
 
 val src_log : Logs.src -> (module LOG)
+(** [src_log src] is a {{!LOG}set of logging functions} for [src]. *)
 
+(** {1:report_ex Cooperative reporter example}
+
+    The following reporter will play nice with [Lwt]'s runtime, it
+    will behave synchronously for the log functions of this module and
+    asynchronously for those of the {!Logs} module (see {!Logs.sync}).
+
+    It reuses {!Logs_fmt.reporter} and will produce colorful output if
+    the standard formatters are setup to do so. For example it can be
+    used instead of {!Logs_fmt.reporter} in the {{!Logs_cli.ex}full
+    setup example}.
+{[
+let lwt_reporter () =
+  let buf_fmt ~like =
+    let b = Buffer.create 512 in
+    Fmt.with_buffer ~like b,
+    fun () -> let m = Buffer.contents b in Buffer.reset b; m
+  in
+  let app, app_flush = buf_fmt ~like:Fmt.stdout in
+  let dst, dst_flush = buf_fmt ~like:Fmt.stderr in
+  let reporter = Logs_fmt.reporter ~app ~dst () in
+  let report src level ~over k msgf =
+    let k () =
+      let write () = match level with
+      | Logs.App -> Lwt_io.write Lwt_io.stdout (app_flush ())
+      | _ -> Lwt_io.write Lwt_io.stderr (dst_flush ())
+      in
+      let unblock () = over (); Lwt.return_unit in
+      Lwt.finalize write unblock |> Lwt.ignore_result;
+      k ()
+    in
+    reporter.Logs.report src level ~over:(fun () -> ()) k msgf;
+  in
+  { Logs.report = report }
+]}
+*)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli.

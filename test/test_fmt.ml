@@ -17,7 +17,7 @@ let err_no_carrier args =
 
 let main () =
   Fmt_tty.setup_std_outputs ();
-  Logs.set_level @@ Some Logs.Debug;
+  Logs.set_level @@ Some Logs.App;
   Logs.set_reporter @@ Logs_fmt.reporter ();
   Logs.info (fun m -> m ~header:"START" ?tags:None "Starting main");
   Logs.warn (fun m -> m "Hey be warned by %d." 7);
@@ -28,8 +28,8 @@ let main () =
   let v = "value" in
   Logs.err (fun m -> m "invalid kv (%a,%a)" pp_key k pp_val v);
   Logs.err (fun m -> m "NO CARRIER");
-  err_invalid_kv @@ fun args -> args k v;
-  err_no_carrier @@ fun () -> ();
+  err_invalid_kv (fun args -> args k v);
+  err_no_carrier (fun () -> ());
   Logs.info (fun m -> m "Ending main");
   exit (if (Logs.err_count () > 0) then 1 else 0)
 

@@ -8,16 +8,15 @@ open Result
 
 type 'a log = ('a, unit Lwt.t) Logs.msgf -> unit Lwt.t
 
-
 let kmsg k ?(src = Logs.default) level msgf = match Logs.Src.level src with
 | None -> k ()
 | Some level' when level > level' ->
-    (if level = Logs.Error then incr Logs._err_count else
-     if level = Logs.Warning then incr Logs._warn_count else ());
+    (if level = Logs.Error then Logs.incr_err_count () else
+     if level = Logs.Warning then Logs.incr_warn_count () else ());
     (k ())
 | Some _ ->
-    (if level = Logs.Error then incr Logs._err_count else
-     if level = Logs.Warning then incr Logs._warn_count else ());
+    (if level = Logs.Error then Logs.incr_err_count () else
+     if level = Logs.Warning then Logs.incr_warn_count () else ());
     let (ret, unblock) = Lwt.wait () in
     let k () = Lwt.bind ret k in
     let over () = Lwt.wakeup unblock () in

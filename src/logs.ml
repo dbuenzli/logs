@@ -193,9 +193,12 @@ let pp_header ppf (l, h) = match h with
 (* Log functions *)
 
 let _err_count = ref 0
-let _warn_count = ref 0
 let err_count () = !_err_count
+let incr_err_count () = incr _err_count
+
+let _warn_count = ref 0
 let warn_count () = !_warn_count
+let incr_warn_count () = incr _warn_count
 
 type 'a log = ('a, unit) msgf -> unit
 

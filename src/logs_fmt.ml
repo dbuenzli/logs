@@ -9,7 +9,7 @@ let warn_style = `Yellow
 let info_style = `Blue
 let debug_style = `Green
 
-let reporter prefix dst app src level over k msgf =
+let reporter prefix app dst src level over k msgf =
   let k _ = over (); k () in
   let with_header style header k ppf fmt =
     Format.kfprintf k ppf ("%s[%a] @[" ^^ fmt ^^ "@]@.") prefix
@@ -35,13 +35,13 @@ let reporter prefix dst app src level over k msgf =
       let header = match header with None -> "DEBUG" | Some h -> h in
       with_header debug_style header k dst fmt
 
-let reporter ?prefix ?(dst = Fmt.stderr) ?(app = Fmt.stdout)  () =
+let reporter ?prefix ?(app = Fmt.stdout) ?(dst = Fmt.stderr) () =
   let prefix = match prefix with
   | None -> Printf.sprintf "%s: " (Filename.basename Sys.executable_name)
   | Some None -> ""
   | Some Some prefix -> prefix
   in
-  let report src level ~over k = reporter prefix dst app src level over k in
+  let report src level ~over k = reporter prefix app dst src level over k in
   { Logs.report = report }
 
 let pp_header ppf (l, h) =

@@ -320,8 +320,8 @@ val set_reporter : reporter -> unit
 (**/**)
 val report : src -> level -> over:(unit -> unit) -> (unit -> 'b) ->
   ('a, 'b) msgf -> 'b
-val _err_count : int ref
-val _warn_count : int ref
+val incr_err_count : unit -> unit
+val incr_warn_count : unit -> unit
 (**/**)
 
 val pp_header : Format.formatter -> (level * string option) -> unit
@@ -368,8 +368,8 @@ let err_no_carrier args =
   Logs.err @@ fun m -> args (m "NO CARRIER")
 
 let () =
-  err_invalid_kv @@ fun args -> args "key" "value";
-  err_no_carrier @@ fun () -> ();
+  err_invalid_kv (fun args -> args "key" "value");
+  err_no_carrier (fun () -> ());
   ()
 ]}
     Note that log messages are formatted and hit the reporter only if
@@ -440,26 +440,43 @@ module Log = (val Logs.src_log src : Logs.LOG)
     {1:sync Note on synchronous logging}
 
     In synchronous logging, a client call to a log function proceeds
-    only once the reporter has finished the logging operation. In
-    [Logs] this depends on both the reporter and the client.
+    only once the reporter has finished the report operation. In
+    [Logs] this depends both on the reporter and the log functions
+    that the client uses.
 
-    The client gives to the reporter a continuation that defines the
-    result type of the log function and a callback to be called whenever
-    the log operation is over (see {!kmsg}). The later can be invoked
-    before or after the continuation and can be used to unblock
-    the continuation, this is what is done for example
+    Whenever the client uses a log function that results in a report,
+    it gives the reporter a continuation that defines the result type
+    of the log function and a callback to be called whenever the log
+    operation is over from the reporter's perspective (see {!type:reporter}).
+    The typical use of the callback is to unblock the continuation given
+    to the reporter. This is used by {!Logs_lwt}'s log functions to make
+    sure that the threads they return proceed only once the report is over.
+    In the functions of {!Logs} however the callback does nothing as there
+    is no way to block the polymorphic continuation.
 
-    For example if the {!Logs_fmt.reporter} is used with formatters
-    that write to channels all log functions will be synchronous
-    and block until either the report is discarded or the formatted
-    message has been written to the channel.
+    Now considering reporters, at the extreme we have:
+    {ul
+    {- A completely asynchronous reporter. This reporter formats the
+       message in memory and immediately invoke the callback followed
+       by the continuation. This provides no guarantee of persistency
+       in case a crash occurs. All log functions behave asynchronously
+       and return as soon as possible.}
+    {- A completely synchronous reporter. This reporter formats the
+       message, persist it, invoke the client callback followed by the
+       continuation. All log functions behave synchronously. An
+       example of such a reporter is {!Logs_fmt.reporter} with
+       formatters baked by channels: when formatting returns the
+       message has been written on the channel.}}
 
-    However this the latter reporter is problematic in an cooperative
-    concurency setting like {!Lwt}, since it will block the whole runtime
-    system. In the latter case the log functions of {!Logs_lwt} can be
-    used.
-
-
+    However a purely synchronous reporter like {!Logs_fmt.reporter}
+    acting on channels does not play well with [Lwt]'s cooperative
+    runtime system. It is possible to reuse {!Logs_fmt.reporter} to
+    define a cooperative reporter, see {{!Logs_lwt.report_ex}this
+    example}. However while this reporter makes {!Logs_lwt}'s log
+    functions synchronous, those of {!Logs} behave asynchronously. For
+    now it seems it that this is unfortunately the best we can do if
+    we want to preserve the ability to use [Logs] with or without
+    cooperative concurency.
 
     {1:ex1 Example with custom reporter and tags}
 

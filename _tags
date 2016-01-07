@@ -10,5 +10,6 @@ true : bin_annot, safe_string, package(result)
                package(cmdliner)
 <test/test_fmt*> : package(fmt), package(fmt.tty)
 <test/test_browser*> : package(fmt), package(js_of_ocaml)
-<test/test_lwt*> : package(lwt), package(lwt.unix), package(fmt.tty)
+<test/test_lwt*> : package(lwt), package(lwt.unix), package(fmt), \
+                   package(fmt.tty)
 <test/tags*> : package(mtime.os)
