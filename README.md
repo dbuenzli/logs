@@ -19,8 +19,8 @@ functions depends on [`Lwt`][4]
 
 Logs and its reporters are distributed under the BSD3 license.
 
-[1]: http://ocsigen.org/js_of_ocaml/
-[2]: http://erratique.ch/software/fmt
+[1]: http://erratique.ch/software/fmt
+[2]: http://ocsigen.org/js_of_ocaml/
 [3]: http://erratique.ch/software/cmdliner
 [4]: http://ocsigen.org/lwt/
 
