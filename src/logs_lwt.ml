@@ -8,11 +8,20 @@ open Result
 
 type 'a log = ('a, unit Lwt.t) Logs.msgf -> unit Lwt.t
 
-let kmsg ?(over = fun () -> ()) k ?src level msgf =
-  let (ret, unblock) = Lwt.wait () in
-  let k () = Lwt.bind ret k in
-  let over () = over (); Lwt.wakeup unblock () in
-  Logs.kmsg ~over k ?src level msgf
+
+let kmsg k ?(src = Logs.default) level msgf = match Logs.Src.level src with
+| None -> k ()
+| Some level' when level > level' ->
+    (if level = Logs.Error then incr Logs._err_count else
+     if level = Logs.Warning then incr Logs._warn_count else ());
+    (k ())
+| Some _ ->
+    (if level = Logs.Error then incr Logs._err_count else
+     if level = Logs.Warning then incr Logs._warn_count else ());
+    let (ret, unblock) = Lwt.wait () in
+    let k () = Lwt.bind ret k in
+    let over () = Lwt.wakeup unblock () in
+    Logs.report src level ~over k msgf
 
 let kunit _ = Lwt.return ()
 let msg ?src level msgf = kmsg kunit ?src level msgf
@@ -60,7 +69,7 @@ end
 let src_log src =
   let module Log = struct
     let msg level msgf = msg ~src level msgf
-    let kmsg ?over k level msgf = kmsg ?over k ~src level msgf
+    let kmsg ?over k level msgf = kmsg k ~src level msgf
     let app msgf = msg Logs.App msgf
     let err msgf = msg Logs.Error msgf
     let warn msgf = msg Logs.Warning msgf

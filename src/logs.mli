@@ -222,15 +222,8 @@ val info : ?src:src -> 'a log
 val debug : ?src:src -> 'a log
 (** [debug] is [msg Debug]. *)
 
-val kmsg : ?over:(unit -> unit) -> (unit -> 'b) -> ?src:src -> level ->
-  ('a, 'b) msgf -> 'b
-(** [kmsg ~over k] is like {!msg} but calls [k] for returning. If
-    [over] is specified, it is always called exactly once to indicate
-    that the logging operation is over (defaults to [fun () -> ()]).
-    It is unspecified whether [over] is called before [k] or
-    vice-versa: this generally depends on whether the message is
-    reported or not and on the reporter itself. See also the note
-    on {{!sync}synchronous logging}. *)
+val kmsg : (unit -> 'b) -> ?src:src -> level -> ('a, 'b) msgf -> 'b
+(** [kmsg k] is like {!msg} but calls [k] for returning. *)
 
 (** {2:result Logging [result] value [Error]s} *)
 
@@ -273,8 +266,7 @@ module type LOG = sig
   val debug : 'a log
   (** [debug] is [msg Debug]. *)
 
-  val kmsg : ?over:(unit -> unit) -> (unit -> 'b) -> level -> ('a, 'b) msgf
-    -> 'b
+  val kmsg : (unit -> 'b) -> level -> ('a, 'b) msgf -> 'b
   (** See {!Logs.kmsg}. *)
 
   (** {2:result Logging [result] value [Error]s} *)
@@ -295,9 +287,8 @@ val src_log : src -> (module LOG)
 (** {1:reporters Reporters} *)
 
 type reporter =
-  { report :
-    'a 'b. src -> level -> over:(unit -> unit) -> (unit -> 'b) ->
-    ('a, 'b) msgf -> 'b }
+  { report : 'a 'b. src -> level -> over:(unit -> unit) -> (unit -> 'b) ->
+      ('a, 'b) msgf -> 'b }
 (** The type for reporters.
 
     A reporter formats and handles log messages that get
@@ -310,7 +301,8 @@ type reporter =
     {- [src] is the logging source.}
     {- [level] is the reporting level.}
     {- [over] must be called by the reporter once the logging operation is
-       over from the reporter's perspective.}
+       over from the reporter's perspective. This may happen before or
+       after [k] is called.}
     {- [k] is the function to invoke to return.}
     {- [msgf] is the {{!msgf}message formatting function} to call.}}
     See an {{!ex1}example}. *)
@@ -324,6 +316,13 @@ val reporter : unit -> reporter
 
 val set_reporter : reporter -> unit
 (** [set_reporter r] sets the current reporter to [r]. *)
+
+(**/**)
+val report : src -> level -> over:(unit -> unit) -> (unit -> 'b) ->
+  ('a, 'b) msgf -> 'b
+val _err_count : int ref
+val _warn_count : int ref
+(**/**)
 
 val pp_header : Format.formatter -> (level * string option) -> unit
 (** [pp_header ppf (l, h)] prints an unspecified representation
@@ -442,12 +441,24 @@ module Log = (val Logs.src_log src : Logs.LOG)
 
     In synchronous logging, a client call to a log function proceeds
     only once the reporter has finished the logging operation. In
-    [Logs] this generally depends on both the reporter and the client.
+    [Logs] this depends on both the reporter and the client.
+
+    The client gives to the reporter a continuation that defines the
+    result type of the log function and a callback to be called whenever
+    the log operation is over (see {!kmsg}). The later can be invoked
+    before or after the continuation and can be used to unblock
+    the continuation, this is what is done for example
 
     For example if the {!Logs_fmt.reporter} is used with formatters
     that write to channels all log functions will be synchronous
     and block until either the report is discarded or the formatted
     message has been written to the channel.
+
+    However this the latter reporter is problematic in an cooperative
+    concurency setting like {!Lwt}, since it will block the whole runtime
+    system. In the latter case the log functions of {!Logs_lwt} can be
+    used.
+
 
 
     {1:ex1 Example with custom reporter and tags}

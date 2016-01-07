@@ -37,11 +37,9 @@ val info : ?src:Logs.src -> 'a log
 val debug : ?src:Logs.src -> 'a log
 (** See {!Logs.debug}. *)
 
-val kmsg : ?over:(unit -> unit) -> (unit -> 'b Lwt.t) -> ?src:Logs.src ->
+val kmsg : (unit -> 'b Lwt.t) -> ?src:Logs.src ->
   Logs.level -> ('a, 'b Lwt.t) Logs.msgf -> 'b Lwt.t
-(** See {!Logs.kmsg}. [over] is called once the log operation is over
-    and the returned thread is only created once the log operation is
-    over. *)
+(** See {!Logs.kmsg}. *)
 
 (** {2 Logging {!result} value [Error]s} *)
 

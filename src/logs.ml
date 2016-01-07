@@ -176,14 +176,15 @@ type ('a, 'b) msgf =
    ('a, Format.formatter, unit, 'b) format4 -> 'a) -> 'b
 
 type reporter =
-  { report : 'a 'b.
-      src -> level -> over:(unit -> unit) -> (unit -> 'b) ->
+  { report :
+      'a 'b. src -> level -> over:(unit -> unit) -> (unit -> 'b) ->
       ('a, 'b) msgf -> 'b }
 
 let nop_reporter = { report = fun _ _ ~over k _ -> over (); k () }
 let _reporter = ref nop_reporter
 let set_reporter r = _reporter := r
 let reporter () = !_reporter
+let report src level ~over k msgf  = !_reporter.report src level ~over k msgf
 
 let pp_header ppf (l, h) = match h with
 | None -> if l = App then () else Format.fprintf ppf "[%a]" pp_level l
@@ -198,21 +199,18 @@ let warn_count () = !_warn_count
 
 type 'a log = ('a, unit) msgf -> unit
 
-let kmsg :
-  type a b. ?over:(unit -> unit) -> (unit -> b) -> ?src:src -> level ->
-  (a, b) msgf -> b
-  =
-  fun ?(over = fun () -> ()) k ?(src = default) level msgf ->
-    match Src.level src with
-    | None -> over (); k ()
-    | Some level' when level > level' ->
-        (if level = Error then incr _err_count else
-         if level = Warning then incr _warn_count else ());
-        (over (); k ())
-    | Some _ ->
-        (if level = Error then incr _err_count else
-         if level = Warning then incr _warn_count else ());
-        !_reporter.report src level ~over k msgf
+let over () = ()
+let kmsg : type a b. (unit -> b) -> ?src:src -> level -> (a, b) msgf -> b =
+fun k ?(src = default) level msgf -> match Src.level src with
+| None -> k ()
+| Some level' when level > level' ->
+    (if level = Error then incr _err_count else
+     if level = Warning then incr _warn_count else ());
+    (k ())
+| Some _ ->
+    (if level = Error then incr _err_count else
+     if level = Warning then incr _warn_count else ());
+    report src level ~over k msgf
 
 let kunit _ = ()
 let msg ?src level msgf = kmsg kunit ?src level msgf
@@ -245,9 +243,7 @@ module type LOG = sig
   val warn : 'a log
   val info : 'a log
   val debug : 'a log
-  val kmsg : ?over:(unit -> unit) -> (unit -> 'b) -> level ->
-    ('a, 'b) msgf -> 'b
-
+  val kmsg : (unit -> 'b) -> level -> ('a, 'b) msgf -> 'b
   val on_error :
     ?level:level -> ?header:string -> ?tags:Tag.set ->
     pp:(Format.formatter -> 'b -> unit) -> use:('b -> 'a) -> ('a, 'b) result ->
@@ -261,7 +257,7 @@ end
 let src_log src =
   let module Log = struct
     let msg level msgf = msg ~src level msgf
-    let kmsg ?over k level msgf = kmsg ?over k ~src level msgf
+    let kmsg k level msgf = kmsg k ~src level msgf
     let app msgf = msg App msgf
     let err msgf = msg Error msgf
     let warn msgf = msg Warning msgf
