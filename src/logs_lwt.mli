@@ -4,7 +4,7 @@
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-(** Lwt support.
+(** {!Lwt} support.
 
     {e Release %%VERSION%% - %%MAINTAINER%% } *)
 

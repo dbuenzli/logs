@@ -7,24 +7,24 @@
 (** Logging.
 
     [Logs] provides a basic logging infrastructure. {{!func}Logging}
-    is performed on {{!Src}sources} whose reporting
+    is performed on {{!srcs}sources} whose reporting
     {{!type:level}level} can be set independently. Log message
     report is decoupled from logging and handled by a
     {{!reporters}reporter}.
 
-    See the {{!basics}basics} and a few {{!usage}usage conventions} to
-    respect.
+    See the {{!basics}basics}, a few {{!usage}usage conventions} to
+    respect and a note on {{!sync}synchronous logging}.
 
     {e Release %%VERSION%% - %%MAINTAINER%% } *)
 
 open Result
 
-(** {1:level_and_sources Reporting levels and sources} *)
+(** {1:levels Reporting levels} *)
 
 (** The type for reporting levels. For level semantics see the
     {{!usage}usage conventions}.
 
-    Logging sources have an optional {{!Src.level}reporting level}. If
+    Log {{!srcs}sources} have an optional {{!Src.level}reporting level}. If
     the level is [Some l] then any message whose level is smaller or
     equal to [l] is reported. If the level is [None] no message is
     ever reported. *)
@@ -43,6 +43,8 @@ val set_level : ?all:bool -> level option -> unit
 val pp_level : Format.formatter -> level -> unit
 (** [pp_level ppf l] prints an unspecified representation of [l] on
     [ppf]. *)
+
+(** {1:srcs Log sources} *)
 
 type src
 (** The type for log sources. A source defines a named unit of logging
@@ -224,10 +226,11 @@ val kmsg : ?over:(unit -> unit) -> (unit -> 'b) -> ?src:src -> level ->
   ('a, 'b) msgf -> 'b
 (** [kmsg ~over k] is like {!msg} but calls [k] for returning. If
     [over] is specified, it is always called exactly once to indicate
-    that the logging operation is over. It is unspecified whether
-    [over] is called before [k] or vice-versa: this generally depends
-    on whether the message is reported or not and on the reporter
-    itself. *)
+    that the logging operation is over (defaults to [fun () -> ()]).
+    It is unspecified whether [over] is called before [k] or
+    vice-versa: this generally depends on whether the message is
+    reported or not and on the reporter itself. See also the note
+    on {{!sync}synchronous logging}. *)
 
 (** {2:result Logging [result] value [Error]s} *)
 
@@ -434,6 +437,18 @@ module Log = (val Logs.src_log src : Logs.LOG)
        understanding of what the program is doing.}
     {- [Debug], condition that allows the program {e developer} to get a
        better undersanding of what the program is doing.}}
+
+    {1:sync Note on synchronous logging}
+
+    In synchronous logging, a client call to a log function proceeds
+    only once the reporter has finished the logging operation. In
+    [Logs] this generally depends on both the reporter and the client.
+
+    For example if the {!Logs_fmt.reporter} is used with formatters
+    that write to channels all log functions will be synchronous
+    and block until either the report is discarded or the formatted
+    message has been written to the channel.
+
 
     {1:ex1 Example with custom reporter and tags}
 
