@@ -37,7 +37,7 @@ let reporter prefix dst app src level over k msgf =
 
 let reporter ?prefix ?(dst = Fmt.stderr) ?(app = Fmt.stdout)  () =
   let prefix = match prefix with
-  | None -> Printf.sprintf "%s: " (Filename.basename Sys.argv.(0))
+  | None -> Printf.sprintf "%s: " (Filename.basename Sys.executable_name)
   | Some None -> ""
   | Some Some prefix -> prefix
   in

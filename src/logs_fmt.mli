@@ -23,7 +23,7 @@ val reporter :
 
     If [prefix] is [Some pre] messages on [dst] are prefixed by [pre] which is
     recommended if you are doing a simple command line tool defaults to
-    [Some (Printf.sprintf "%s: " (Filename.basename Sys.argv.(0))].
+    [Some (Printf.sprintf "%s: " (Filename.basename Sys.executable_name)].
 
     The reporter does not process or render information about
     message sources or tags.
