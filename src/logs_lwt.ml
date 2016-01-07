@@ -42,7 +42,7 @@ let on_error_msg ?src ?(level = Logs.Error) ?header ?tags ~use t =
   | Ok v -> Lwt.return v
   | Error (`Msg e) ->
       kmsg use ?src level @@ fun m ->
-      m ?header ?tags "@[%a@]" Format.pp_print_text e
+      m ?header ?tags "@[%a@]" Logs.pp_print_text e
 
 (* Source specific functions *)
 

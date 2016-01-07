@@ -8,6 +8,22 @@ open Result
 
 let strf = Format.asprintf
 
+let pp_print_text ppf s =
+  (* hint spaces and new lines with Format's funs *)
+  let len = String.length s in
+  let left = ref 0 in
+  let right = ref 0 in
+  let flush () =
+    Format.pp_print_string ppf (String.sub s !left (!right - !left));
+    incr right; left := !right;
+  in
+  while (!right <> len) do
+    if s.[!right] = '\n' then (flush (); Format.pp_force_newline ppf ()) else
+    if s.[!right] = ' ' then (flush (); Format.pp_print_space ppf ()) else
+    incr right
+  done;
+  if !left <> len then flush ()
+
 (* Reporting levels *)
 
 type level = App | Error | Warning | Info | Debug
@@ -66,40 +82,19 @@ let set_level ?(all = true) l =
 
 module Tag = struct
 
-  (* A little bit of type trickery, type identifiers.
-     See http://alan.petitepomme.net/cwn/2015.03.24.html#1 *)
+  (* Universal type, see http://mlton.org/UniversalType *)
 
-  module Tid = struct type _ t = .. end
-  module type Tid = sig
-    type t
-    type _  Tid.t += Tid : t Tid.t
-  end
-
-  type 'a tid = (module Tid with type t = 'a)
-
-  let tid () (type s) =
-    let module M = struct
-      type t = s
-      type _ Tid.t += Tid : t Tid.t
-    end
-    in
-    (module M : Tid with type t = s)
-
-  type ('a, 'b) teq = Teq : ('a, 'a) teq
-
-  let eq : type r s. r tid -> s tid -> (r, s) teq option =
-  fun r s ->
-    let module R = (val r : Tid with type t = r) in
-    let module S = (val s : Tid with type t = s) in
-    match R.Tid with
-    | S.Tid -> Some Teq
-    | _ -> None
+  type univ = exn
+  let univ (type s) () =
+    let module M = struct exception E of s option end in
+    (fun x -> M.E (Some x)), (function M.E x -> x | _ -> None)
 
   (* Tag definitions *)
 
   type 'a def =
     { uid : int;
-      tid : 'a tid;
+      to_univ : 'a -> univ;
+      of_univ : univ -> 'a option;
       name : string;
       doc : string;
       pp : Format.formatter -> 'a -> unit; }
@@ -112,7 +107,8 @@ module Tag = struct
     fun () -> incr id; !id
 
   let def ?(doc = "undocumented") name pp =
-    { uid = uid (); tid = tid ();  name; doc; pp }
+    let to_univ, of_univ = univ () in
+    { uid = uid (); to_univ; of_univ; name; doc; pp }
 
   let name d = d.name
   let doc d = d.doc
@@ -146,10 +142,7 @@ module Tag = struct
   let find : type a. a def -> set -> a option =
   fun k s ->
     try match M.find (Key.V k) s with
-    | V (k', v) ->
-        match eq k.tid k'.tid with
-        | None -> None
-        | Some Teq -> Some v
+    | V (k', v) -> k.of_univ (k'.to_univ v)
     with Not_found -> None
 
   let get k s = match find k s with
@@ -235,7 +228,7 @@ let on_error_msg ?src ?(level = Error) ?header ?tags ~use = function
 | Ok v -> v
 | Error (`Msg msg) ->
     kmsg use ?src level @@ fun m ->
-    m ?header ?tags "@[%a@]" Format.pp_print_text msg
+    m ?header ?tags "@[%a@]" pp_print_text msg
 
 (* Source specific logging functions *)
 

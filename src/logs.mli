@@ -322,6 +322,7 @@ val report : src -> level -> over:(unit -> unit) -> (unit -> 'b) ->
   ('a, 'b) msgf -> 'b
 val incr_err_count : unit -> unit
 val incr_warn_count : unit -> unit
+val pp_print_text : Format.formatter -> string -> unit
 (**/**)
 
 val pp_header : Format.formatter -> (level * string option) -> unit
