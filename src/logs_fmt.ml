@@ -9,57 +9,37 @@ let warn_style = `Yellow
 let info_style = `Blue
 let debug_style = `Green
 
-let reporter prefix app dst src level over k msgf =
-  let k _ = over (); k () in
-  let with_header style header k ppf fmt =
-    Format.kfprintf k ppf ("%s[%a] @[" ^^ fmt ^^ "@]@.") prefix
-      Fmt.(styled style string) header
-  in
-  msgf @@ fun ?header ?tags fmt ->
-  match level with
-  | Logs.App ->
-      begin match header with
-      | None -> Format.kfprintf k app ("@[" ^^ fmt ^^ "@]@.")
-      | Some l -> Format.kfprintf k app ("[%s] @[" ^^ fmt ^^ "@]@.") l
-      end
-  | Logs.Error ->
-      let header = match header with None -> "ERROR" | Some h -> h in
-      with_header err_style header k dst fmt
-  | Logs.Warning ->
-      let header = match header with None -> "WARNING" | Some h -> h in
-      with_header warn_style header k dst fmt
-  | Logs.Info ->
-      let header = match header with None -> "INFO" | Some h -> h in
-      with_header info_style header k dst fmt
-  | Logs.Debug ->
-      let header = match header with None -> "DEBUG" | Some h -> h in
-      with_header debug_style header k dst fmt
+let pp_header ~pp_h ppf (l, h) = match l with
+| Logs.App ->
+    (match h with None -> () | Some h -> Fmt.pf ppf "[%s]" h)
+| Logs.Error ->
+    pp_h ppf err_style (match h with None -> "ERROR" | Some h -> h)
+| Logs.Warning ->
+    pp_h ppf warn_style (match h with None -> "WARNING" | Some h -> h)
+| Logs.Info ->
+    pp_h ppf info_style (match h with None -> "INFO" | Some h -> h)
+| Logs.Debug ->
+    pp_h ppf debug_style (match h with None -> "DEBUG" | Some h -> h)
 
-let reporter ?prefix ?(app = Fmt.stdout) ?(dst = Fmt.stderr) () =
-  let prefix = match prefix with
-  | None -> Printf.sprintf "%s: " (Filename.basename Sys.executable_name)
-  | Some None -> ""
-  | Some Some prefix -> prefix
-  in
-  let report src level ~over k = reporter prefix app dst src level over k in
+let pp_exec_header =
+  let x = Filename.basename Sys.executable_name in
+  let pp_h ppf style h = Fmt.pf ppf "%s: [%a] " x Fmt.(styled style string) h in
+  pp_header ~pp_h
+
+let reporter pp_header app dst src level over k msgf =
+  let k _ = over (); k () in
+  msgf @@ fun ?header ?tags fmt ->
+  let ppf = if level = Logs.App then app else dst in
+  Fmt.kpf k ppf ("%a@[" ^^ fmt ^^ "@]@.") pp_header (level, header)
+
+let reporter
+    ?(pp_header = pp_exec_header) ?(app = Fmt.stdout) ?(dst = Fmt.stderr) () =
+  let report src level ~over k = reporter pp_header app dst src level over k in
   { Logs.report = report }
 
-let pp_header ppf (l, h) =
-  let pp_h ppf style h = Fmt.(pf ppf "[%a]" (styled style string) h) in
-  match l with
-  | Logs.App ->
-      begin match h with
-      | None -> ()
-      | Some h -> Format.fprintf ppf "[%s]" h
-      end
-  | Logs.Error ->
-      pp_h ppf err_style (match h with None -> "ERROR" | Some h -> h)
-  | Logs.Warning ->
-      pp_h ppf err_style (match h with None -> "WARNING" | Some h -> h)
-  | Logs.Info ->
-      pp_h ppf err_style (match h with None -> "INFO" | Some h -> h)
-  | Logs.Debug ->
-      pp_h ppf err_style (match h with None -> "DEBUG" | Some h -> h)
+let pp_header =
+  let pp_h ppf style h = Fmt.pf ppf "[%a]" Fmt.(styled style string) h in
+  pp_header ~pp_h
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli.

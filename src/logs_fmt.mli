@@ -14,20 +14,19 @@
 (** {1 Reporter} *)
 
 val reporter :
-  ?prefix:string option ->
+  ?pp_header:(Logs.level * string option) Fmt.t ->
   ?app:Format.formatter ->
   ?dst:Format.formatter -> unit -> Logs.reporter
-(** [reporter ~prefix ~app ~dst ()] is a reporter that reports {!Logs.App}
+(** [reporter ~pp_header ~app ~dst ()] is a reporter that reports {!Logs.App}
     level messages on [app] (defaults to {!Format.std_formatter}) and
     all other levels on [dst] (defaults to {!Format.err_formatter}).
 
-    If [prefix] is [Some pre] messages on [dst] are prefixed by [pre] which is
-    recommended if you are doing a simple command line tool defaults to:
-{[
-Some (Printf.sprintf "%s: " @@ Filename.basename Sys.executable_name)
-]}
-    The reporter does not process or render information about
-    message sources or tags.
+    [pp_header] determines how message headers are rendered. The default
+    prefixes the executable name and renders the header with
+    {!pp_header}.
+
+    The reporter does not process or render information about message
+    sources or tags.
 
     ANSI colors will be used in the output if the formatters are
     configured to do so, see {!Fmt.set_style_renderer} and
@@ -55,7 +54,7 @@ val info_style : Fmt.style
 val debug_style : Fmt.style
 (** [debug_style] is the style used to render headers at debug level. *)
 
-val pp_header : Format.formatter -> (Logs.level * string option) -> unit
+val pp_header : (Logs.level * string option) Fmt.t
 (** [pp_header] is like {!Logs.pp_header} but may use ANSI colors if the
     formatter is configured to do so, see {!Fmt.set_style_renderer} and
     {!Fmt_tty}. *)
