@@ -4,10 +4,7 @@
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-(** {!Format} reporter for {!Logs}.
-
-    Reports message using two formatters. One for {!Logs.App}
-    level message and the other one for the other levels.
+(** {!Format} colorful reporter for {!Logs}.
 
     {e Release %%VERSION%% - %%MAINTAINER%% } *)
 
@@ -17,28 +14,11 @@ val reporter :
   ?pp_header:(Logs.level * string option) Fmt.t ->
   ?app:Format.formatter ->
   ?dst:Format.formatter -> unit -> Logs.reporter
-(** [reporter ~pp_header ~app ~dst ()] is a reporter that reports {!Logs.App}
-    level messages on [app] (defaults to {!Format.std_formatter}) and
-    all other levels on [dst] (defaults to {!Format.err_formatter}).
+(** [reporter] is like {!Logs.format_reporter} except ANSI colors may be
+    used in message header rendering if the formatters are configured to do so;
+    see {!Fmt.set_style_renderer} and {!Fmt_tty}.
 
-    [pp_header] determines how message headers are rendered. The default
-    prefixes the executable name and renders the header with
-    {!pp_header}.
-
-    The reporter does not process or render information about message
-    sources or tags.
-
-    ANSI colors will be used in the output if the formatters are
-    configured to do so, see {!Fmt.set_style_renderer} and
-    {!Fmt_tty}. Consult a {{!Logs_cli.ex}full setup example}.
-
-    {b Important.} This is a synchronous reporter it considers the log
-    operation to be over once the message was formatted and before
-    calling the continuation (see the {{!Logs.sync}note on synchronous
-    logging}). In particular if the formatters are baked by channels,
-    it will block until the message has been formatted on the channel
-    before proceeding which may not be suitable in a cooperative
-    concurrency setting like {!Lwt}. *)
+    Consult a full command line {{!Logs_cli.ex}setup example}. *)
 
 (** {1:cheader Colored message headers} *)
 

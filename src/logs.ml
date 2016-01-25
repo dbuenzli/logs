@@ -183,6 +183,30 @@ let pp_header ppf (l, h) = match h with
 | None -> if l = App then () else Format.fprintf ppf "[%a]" pp_level l
 | Some h -> Format.fprintf ppf "[%s]" h
 
+let pp_exec_header =
+  let x = Filename.basename Sys.executable_name in
+  let pf = Format.fprintf in
+  let pp_header ppf (l, h) =
+    if l = App then (match h with None -> () | Some h -> pf ppf "[%s] " h) else
+    match h with
+    | None -> pf ppf "%s: [%a] " x pp_level l
+    | Some h -> pf ppf "%s: [%s] " x h
+  in
+  pp_header
+
+let format_reporter
+    ?(pp_header = pp_exec_header)
+    ?(app = Format.err_formatter)
+    ?(dst = Format.std_formatter) ()
+  =
+  let report src level ~over k msgf =
+    let k _ = over (); k () in
+    msgf @@ fun ?header ?tags fmt ->
+    let ppf = if level = App then app else dst in
+    Format.kfprintf k ppf ("%a@[" ^^ fmt ^^ "@]@.") pp_header (level, header)
+  in
+  { report }
+
 (* Log functions *)
 
 let _err_count = ref 0

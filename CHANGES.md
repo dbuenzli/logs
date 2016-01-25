@@ -1,6 +1,10 @@
 
+
+* Add `Logs.format_reporter` a reporter like `Logs_fmt.reporter`
+  but without colors and hence without the dependency on `Fmt`.
+  Thanks to Simon Cruanes for the suggestion.
 * `Logs_fmt.reporter`, the optional argument `prefix` is changed
-  to `header` and becomes a formatter.
+  to `pp_header` and becomes a formatter.
 * Fix colors in `Logs_fmt.pp_header`, only `Logs.err_style` was
   begin used.
 

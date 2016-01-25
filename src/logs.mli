@@ -311,6 +311,28 @@ val nop_reporter : reporter
 (** [nop_reporter] is the initial reporter returned by {!reporter}, it
     does nothing if a log message gets reported. *)
 
+val format_reporter :
+  ?pp_header:(Format.formatter -> (level * string option) -> unit) ->
+  ?app:Format.formatter -> ?dst:Format.formatter -> unit -> reporter
+(** [format_reporter ~pp_header ~app ~dst ()] is a reporter that reports
+    {!App} level messages on [app] (defauts to {!Format.std_formatter})
+    and all other level on [dst] (defaults to {!Format.err_formatter}).
+
+    [pp_header] determines how message headers are rendered. The default
+    prefixes the executable name and renders the header with {!pp_header}.
+    Use {!Logs_fmt.reporter} if you want colored headers rendering.
+
+    The reporter does not process or render information about message
+    sources or tags.
+
+    {b Important.} This is a synchronous reporter it considers the log
+    operation to be over once the message was formatted and before
+    calling the continuation (see the {{!Logs.sync}note on synchronous
+    logging}). In particular if the formatters are baked by channels,
+    it will block until the message has been formatted on the channel
+    before proceeding which may not be suitable in a cooperative
+    concurrency setting like {!Lwt}. *)
+
 val reporter : unit -> reporter
 (** [reporter ()] is the current repporter. *)
 

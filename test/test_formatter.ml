@@ -1,40 +1,40 @@
 (*---------------------------------------------------------------------------
-   Copyright (c) 2015 Daniel C. Bünzli. All rights reserved.
+   Copyright (c) 2016 Daniel C. Bünzli. All rights reserved.
    Distributed under the BSD3 license, see license at the end of the file.
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-let err_style = `Red
-let warn_style = `Yellow
-let info_style = `Blue
-let debug_style = `Green
+let pp_key = Format.pp_print_string
+let pp_val = Format.pp_print_string
 
-let pp_header ~pp_h ppf (l, h) = match l with
-| Logs.App ->
-    (match h with None -> () | Some h -> Fmt.pf ppf "[%s] " h)
-| Logs.Error ->
-    pp_h ppf err_style (match h with None -> "ERROR" | Some h -> h)
-| Logs.Warning ->
-    pp_h ppf warn_style (match h with None -> "WARNING" | Some h -> h)
-| Logs.Info ->
-    pp_h ppf info_style (match h with None -> "INFO" | Some h -> h)
-| Logs.Debug ->
-    pp_h ppf debug_style (match h with None -> "DEBUG" | Some h -> h)
+let err_invalid_kv args =
+  Logs.err @@ fun m ->
+  args (fun k v -> m "invalid kv (%a,%a)" pp_key k pp_val v)
 
-let pp_exec_header =
-  let x = Filename.basename Sys.executable_name in
-  let pp_h ppf style h = Fmt.pf ppf "%s: [%a] " x Fmt.(styled style string) h in
-  pp_header ~pp_h
+let err_no_carrier args =
+  Logs.err @@ fun m -> args (m "NO CARRIER")
 
-let reporter ?(pp_header = pp_exec_header) ?app ?dst () =
-  Logs.format_reporter ~pp_header ?app ?dst ()
+let main () =
+  Logs.set_level @@ Some Logs.Debug;
+  Logs.set_reporter @@ Logs.format_reporter ();
+  Logs.info (fun m -> m ~header:"START" ?tags:None "Starting main");
+  Logs.warn (fun m -> m "Hey be warned by %d." 7);
+  Logs.err (fun m -> m "Hey be errored.");
+  Logs.debug (fun m -> m "Would you mind to be debugged a bit ?");
+  Logs.app (fun m -> m "This is for the application console or stdout.");
+  let k = "key" in
+  let v = "value" in
+  Logs.err (fun m -> m "invalid kv (%a,%a)" pp_key k pp_val v);
+  Logs.err (fun m -> m "NO CARRIER");
+  err_invalid_kv (fun args -> args k v);
+  err_no_carrier (fun () -> ());
+  Logs.info (fun m -> m "Ending main");
+  exit (if (Logs.err_count () > 0) then 1 else 0)
 
-let pp_header =
-  let pp_h ppf style h = Fmt.pf ppf "[%a]" Fmt.(styled style string) h in
-  pp_header ~pp_h
+let () = main ()
 
 (*---------------------------------------------------------------------------
-   Copyright (c) 2015 Daniel C. Bünzli.
+   Copyright (c) 2016 Daniel C. Bünzli.
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
