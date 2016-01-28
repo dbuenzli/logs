@@ -14,21 +14,23 @@
 
 val level : ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
     Logs.level option Cmdliner.Term.t
-(** [level ?env ?docs ()] is a term for two {!Cmdliner} options that
+(** [level ?env ?docs ()] is a term for three {!Cmdliner} options that
     can be used with {!Logs.set_level}.  The options are documented
     under [docs] (defaults to the default of {!Cmdliner.Arg.info}).
 
     The options work as follows:
     {ul
-    {- [-v [LEVEL]] or [--verbose=[LEVEL]], the value of the term
-       is [Some l] where [l] depends on [LEVEL]. If [LEVEL] is
-       unspecified the value of the term is [Some Logs.Info].}
+    {- [-v] or [--verbose], if it appears once, the value of
+       the term is is [Some Logs.Info] and more than once
+       [Some Logs.Debug].}
+    {- [--verbosity=LEVEL], the value of the term is [l] where
+       [l] depends on on [LEVEL]. Takes over the option [-v].}
     {- [-q] or [--quiet], the value of the term is [None]. Takes
-       over the [--verbose] option if both are present.}
+       over the [-v] and [--verbosity] options.}
     {- If both options are absent the default value is
        [Some Logs.warning]}}
 
-    If [env] is provided, the default value in case both options are
+    If [env] is provided, the default value in case all options are
     absent can be overridden by the corresponding environment
     variable. *)
 

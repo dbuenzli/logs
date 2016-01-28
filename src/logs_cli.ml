@@ -9,23 +9,43 @@ open Cmdliner
 let strf = Format.asprintf
 
 let level ?env ?docs () =
-  let enum =
-    [ "quiet", None; "error", Some Logs.Error; "warning", Some Logs.Warning;
-      "info", Some Logs.Info; "debug", Some Logs.Debug; ]
+  let vopts =
+    let doc = "Increase verbosity. Repeatable, but more than twice does
+               not bring more."
+    in
+    Arg.(value & flag_all & info ["v"; "verbose"] ~doc ?docs)
   in
-  let log_level = Arg.enum enum in
-  let enum_alts = Arg.doc_alts_enum enum in
-  let doc = strf "Be more or less verbose. $(docv) must be %s." enum_alts in
-  let verbose =
-    Arg.(value & opt ~vopt:(Some Logs.Info) log_level (Some Logs.Warning) &
-         info ["v"; "verbose"] ?env ~docv:"LEVEL" ~doc ?docs)
+  let verbosity =
+    let enum =
+      [ "warning", None; (* Hack for the option's absent rendering *)
+        "quiet", Some None;
+        "error", Some (Some Logs.Error);
+        "warning", Some (Some Logs.Warning);
+        "info", Some (Some Logs.Info);
+        "debug", Some (Some Logs.Debug); ]
+    in
+    let log_level = Arg.enum enum in
+    let enum_alts = Arg.doc_alts_enum List.(tl enum) in
+    let doc = strf "Be more or less verbose. $(docv) must be %s. Takes over
+                    $(b,-v)." enum_alts
+    in
+    Arg.(value & opt log_level None &
+         info ["verbosity"] ?env ~docv:"LEVEL" ~doc ?docs)
   in
   let quiet =
-    let doc = "Be quiet. Takes over $(b,--verbose)." in
+    let doc = "Be quiet. Takes over $(b,-v) and $(b,--verbosity)." in
     Arg.(value & flag & info ["q"; "quiet"] ~doc ?docs)
   in
-  let choose quiet verbose_opt = if quiet then None else verbose_opt in
-  Term.(pure choose $ quiet $ verbose)
+  let choose quiet verbosity vopts =
+    if quiet then None else match verbosity with
+    | Some verbosity -> verbosity
+    | None ->
+        match List.length vopts with
+        | 0 -> Some Logs.Warning
+        | 1 -> Some Logs.Info
+        | n -> Some Logs.Debug
+  in
+  Term.(const choose $ quiet $ verbosity $ vopts)
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli.

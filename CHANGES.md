@@ -1,12 +1,14 @@
 
 
+* Revise the command line interface provided by `Logs_cli`. Removes
+  the argument from option `-v`. See issue #13 for details.
 * Add `Logs.format_reporter` a reporter like `Logs_fmt.reporter`
   but without colors and hence without the dependency on `Fmt`.
   Thanks to Simon Cruanes for the suggestion.
 * `Logs_fmt.reporter`, the optional argument `prefix` is changed
   to `pp_header` and becomes a formatter.
 * Fix colors in `Logs_fmt.pp_header`, only `Logs.err_style` was
-  begin used.
+  being used.
 
 
 v0.5.0 2016-01-07 La Forclaz (VS)
