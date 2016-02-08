@@ -22,6 +22,9 @@ val reporter :
 
 (** {1:cheader Colored message headers} *)
 
+val app_style : Fmt.style
+(** [app_style] is the style used to render headers at app level. *)
+
 val err_style : Fmt.style
 (** [err_style] is the style used to render headers at error level. *)
 

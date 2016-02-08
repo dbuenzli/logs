@@ -7,11 +7,13 @@
 let main _ =
   Logs.set_level @@ Some Logs.Debug;
   Logs.set_reporter @@ Logs_browser.console_reporter ();
-  Logs.info (fun m -> m ~header:"START" "Starting main");
+  Logs.info (fun m -> m ~header:"START" ?tags:None "Starting main");
   Logs.warn (fun m -> m "Hey be warned by %d." 7);
   Logs.err (fun m -> m "Hey be errored.");
   Logs.debug (fun m -> m "Would you mind to be debugged a bit ?");
   Logs.app (fun m -> m "This is for the application console or stdout.");
+  Logs.app (fun m -> m ~header:"HEAD" "Idem but with a header");
+  Logs.err (fun m -> m "NO CARRIER");
   Logs.info (fun m -> m "Ending main");
   Js._false
 

@@ -24,6 +24,7 @@ let main () =
   Logs.err (fun m -> m "Hey be errored.");
   Logs.debug (fun m -> m "Would you mind to be debugged a bit ?");
   Logs.app (fun m -> m "This is for the application console or stdout.");
+  Logs.app (fun m -> m ~header:"HEAD" "Idem but with a header");
   let k = "key" in
   let v = "value" in
   Logs.err (fun m -> m "invalid kv (%a,%a)" pp_key k pp_val v);

@@ -4,6 +4,7 @@
    %%NAME%% release %%VERSION%%
   ---------------------------------------------------------------------------*)
 
+let app_style = `Cyan
 let err_style = `Red
 let warn_style = `Yellow
 let info_style = `Blue
@@ -11,7 +12,10 @@ let debug_style = `Green
 
 let pp_header ~pp_h ppf (l, h) = match l with
 | Logs.App ->
-    (match h with None -> () | Some h -> Fmt.pf ppf "[%s] " h)
+    begin match h with
+    | None -> ()
+    | Some h -> Fmt.pf ppf "[%a] " Fmt.(styled app_style string) h
+    end
 | Logs.Error ->
     pp_h ppf err_style (match h with None -> "ERROR" | Some h -> h)
 | Logs.Warning ->
