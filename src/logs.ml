@@ -184,7 +184,10 @@ let pp_header ppf (l, h) = match h with
 | Some h -> Format.fprintf ppf "[%s]" h
 
 let pp_exec_header =
-  let x = Filename.basename Sys.executable_name in
+  let x = match Array.length Sys.argv with
+  | 0 -> Filename.basename Sys.executable_name
+  | n -> Filename.basename Sys.argv.(0)
+  in
   let pf = Format.fprintf in
   let pp_header ppf (l, h) =
     if l = App then (match h with None -> () | Some h -> pf ppf "[%s] " h) else

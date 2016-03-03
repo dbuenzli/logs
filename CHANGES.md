@@ -5,8 +5,11 @@
 * Add `Logs.format_reporter` a reporter like `Logs_fmt.reporter`
   but without colors and hence without the dependency on `Fmt`.
   Thanks to Simon Cruanes for the suggestion.
-* `Logs_fmt.reporter`, the optional argument `prefix` is changed
-  to `pp_header` and becomes a formatter.
+* `Logs_fmt.reporter`, the optional argument `prefix` is changed to
+  `pp_header` and becomes a formatter. The default prefix now favors
+  the basename of `Sys.argv.(0)` if it exists over
+  `Sys.executable_name`; this gives better results for interpreted
+  programs.
 * Fix colors in `Logs_fmt.pp_header`, only `Logs.err_style` was
   being used.
 

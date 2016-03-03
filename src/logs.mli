@@ -319,7 +319,7 @@ val format_reporter :
     and all other level on [dst] (defaults to {!Format.err_formatter}).
 
     [pp_header] determines how message headers are rendered. The default
-    prefixes the executable name and renders the header with {!pp_header}.
+    prefixes the program name and renders the header with {!pp_header}.
     Use {!Logs_fmt.reporter} if you want colored headers rendering.
 
     The reporter does not process or render information about message
