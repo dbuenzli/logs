@@ -1,5 +1,6 @@
 
 
+* Relicensed from BSD3 to ISC.
 * Revise the command line interface provided by `Logs_cli`. Removes
   the argument from option `-v`. See issue #13 for details.
 * Add `Logs.format_reporter` a reporter like `Logs_fmt.reporter`
