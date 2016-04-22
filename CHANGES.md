@@ -13,6 +13,7 @@
   programs.
 * Fix colors in `Logs_fmt.pp_header`, only `Logs.err_style` was
   being used.
+* Add `Logs.level_{of,to}_string`.
 
 
 v0.5.0 2016-01-07 La Forclaz (VS)

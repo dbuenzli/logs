@@ -44,6 +44,14 @@ val pp_level : Format.formatter -> level -> unit
 (** [pp_level ppf l] prints an unspecified representation of [l] on
     [ppf]. *)
 
+val level_to_string : level option -> string
+(** [level_to_string l] converts [l] to an unspecified human-readable
+    US-ASCII string that can be parsed back by {!level_of_string}. *)
+
+val level_of_string : string -> (level option, [`Msg of string]) Result.result
+(** [level_of_string s] parses the representation of {!level_to_string}
+    from [s]. *)
+
 (** {1:srcs Log sources} *)
 
 type src

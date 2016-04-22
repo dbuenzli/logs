@@ -36,6 +36,19 @@ let pp_level ppf = function
 | Info -> Format.pp_print_string ppf "INFO"
 | Debug -> Format.pp_print_string ppf "DEBUG"
 
+let level_to_string = function
+| None -> "quiet" | Some App -> "app" | Some Error -> "error"
+| Some Warning -> "warning" | Some Info -> "info" | Some Debug -> "debug"
+
+let level_of_string = function
+| "quiet" -> Ok None
+| "app" -> Ok (Some App)
+| "error" -> Ok (Some Error)
+| "warning" -> Ok (Some Warning)
+| "info" -> Ok (Some Info)
+| "debug" -> Ok (Some Debug)
+| l -> Error (`Msg (strf "%S: unknown log level" l))
+
 (* Sources *)
 
 module Src = struct
