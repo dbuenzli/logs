@@ -1,6 +1,6 @@
 Logs — Logging infrastructure for OCaml
 -------------------------------------------------------------------------------
-Release %%VERSION%%
+%%VERSION%%
 
 Logs provides a logging infrastructure for OCaml. Logging is performed
 on sources whose reporting level can be set independently. Log message
@@ -10,19 +10,19 @@ A few optional log reporters are distributed with the base library and
 the API easily allows to implement your own.
 
 `Logs` depends only on the `result` compatibility package. The
-optional `Logs_fmt` reporter on OCaml formatters depends on [Fmt][1].
+optional `Logs_fmt` reporter on OCaml formatters depends on [Fmt][fmt].
 The optional `Logs_browser` reporter that reports to the web browser
-console depends on [js_of_ocaml][2]. The optional `Logs_cli` library
+console depends on [js_of_ocaml][jsoo]. The optional `Logs_cli` library
 that provides command line support for controlling Logs depends on
-[`Cmdliner`][3]. The optional `Logs_lwt` library that provides Lwt logging
-functions depends on [`Lwt`][4]
+[`Cmdliner`][cmdliner]. The optional `Logs_lwt` library that provides Lwt logging
+functions depends on [`Lwt`][lwt]
 
 Logs and its reporters are distributed under the ISC license.
 
-[1]: http://erratique.ch/software/fmt
-[2]: http://ocsigen.org/js_of_ocaml/
-[3]: http://erratique.ch/software/cmdliner
-[4]: http://ocsigen.org/lwt/
+[fmt]: http://erratique.ch/software/fmt
+[jsoo]: http://ocsigen.org/js_of_ocaml/
+[cmdliner]: http://erratique.ch/software/cmdliner
+[lwt]: http://ocsigen.org/lwt/
 
 Home page: http://erratique.ch/software/logs  
 Contact: Daniel Bünzli `<daniel.buenzl i@erratique.ch>`

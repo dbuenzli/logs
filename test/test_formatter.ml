@@ -1,7 +1,7 @@
 (*---------------------------------------------------------------------------
    Copyright (c) 2016 Daniel C. Bünzli. All rights reserved.
    Distributed under the ISC license, see terms at the end of the file.
-   %%NAME%% v%%VERSION%%
+   %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
 let pp_key = Format.pp_print_string

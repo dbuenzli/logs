@@ -1,7 +1,7 @@
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli. All rights reserved.
    Distributed under the ISC license, see terms at the end of the file.
-   %%NAME%% v%%VERSION%%
+   %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
 (** Logging.
@@ -15,7 +15,7 @@
     See the {{!basics}basics}, a few {{!usage}usage conventions} to
     respect and a note on {{!sync}synchronous logging}.
 
-    {e Release %%VERSION%% - %%MAINTAINER%% } *)
+    {e %%VERSION%% - {{:%%PKG_HOMEPAGE%% }homepage}} *)
 
 open Result
 

@@ -22,8 +22,8 @@ action ()
             js_of_ocaml _build/test/test_browser.byte -o \
                         _build/test/test_browser.js
             shift;
-            if [ "$1" = "-b" ]; then
-                reload-browser \
+            if [ "$1" = "-r" ]; then
+                topkg browse \
                 "http://`hostname`/logs/test/test_browser.html"
             fi
             ;;
@@ -32,8 +32,8 @@ action ()
             action lib
             $OCAMLBUILD test/tests.otarget
             ;;
-        doc)     shift; pkg-doc $* doc/dev-api.docdir ;;
-        api-doc) shift; pkg-doc $* doc/api.docdir ;;
+        doc)     shift; topkg doc --dev $* ;;
+        api-doc) shift; topkg doc $* ;;
         clean)   $OCAMLBUILD -clean ;;
         *)       $OCAMLBUILD $* ;;
     esac

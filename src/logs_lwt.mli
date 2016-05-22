@@ -1,7 +1,7 @@
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli. All rights reserved.
    Distributed under the ISC license, see terms at the end of the file.
-   %%NAME%% v%%VERSION%%
+   %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
 (** {!Lwt} logging.
@@ -12,7 +12,7 @@
 
     See a {{!report_ex}cooperative reporter example}.
 
-    {e Release %%VERSION%% - %%MAINTAINER%% } *)
+    {e %%VERSION%% - {{:%%PKG_HOMEPAGE%% }homepage}} *)
 
 (** {1 Log functions} *)
 

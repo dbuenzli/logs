@@ -1,7 +1,7 @@
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 Daniel C. Bünzli. All rights reserved.
    Distributed under the ISC license, see terms at the end of the file.
-   %%NAME%% v%%VERSION%%
+   %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
 let () = ignore (Toploop.use_file Format.err_formatter "Logs_top_init.ml")
