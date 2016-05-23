@@ -1,4 +1,5 @@
-
+v0.6.0 2016-05-23 La Forclaz (VS)
+---------------------------------
 
 * Build depend on topkg.
 * Relicensed from BSD3 to ISC.
