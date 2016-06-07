@@ -1,3 +1,6 @@
+
+* Fix logs.top package on case sensitive file systems.
+
 v0.6.0 2016-05-23 La Forclaz (VS)
 ---------------------------------
 
