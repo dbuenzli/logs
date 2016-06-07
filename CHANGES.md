@@ -1,3 +1,5 @@
+v0.6.1 2016-06-08 Cambridge (UK)
+--------------------------------
 
 * Fix logs.top package on case sensitive file systems.
 
