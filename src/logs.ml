@@ -114,7 +114,7 @@ module Tag = struct
 
   type def_e = Def : 'a def -> def_e
 
-  let list = ref []
+  let list = ref ([] : def_e list)
   let uid =
     let id = ref (-1) in
     fun () -> incr id; !id
