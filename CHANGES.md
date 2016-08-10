@@ -1,3 +1,9 @@
+v0.6.2 2016-08-10 Zagreb
+------------------------
+
+* 4.04.0 compatibility. Thanks to Damien Doligez for the patch.
+
+
 v0.6.1 2016-06-08 Cambridge (UK)
 --------------------------------
 
