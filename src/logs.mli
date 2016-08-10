@@ -45,8 +45,9 @@ val pp_level : Format.formatter -> level -> unit
     [ppf]. *)
 
 val level_to_string : level option -> string
-(** [level_to_string l] converts [l] to an unspecified human-readable
-    US-ASCII string that can be parsed back by {!level_of_string}. *)
+(** [level_to_string l] converts [l] to an US-ASCII string that can be
+    parsed back by {!level_of_string} and by the [LEVEL] option
+    argument of {!Logs_cli.level}. *)
 
 val level_of_string : string -> (level option, [`Msg of string]) Result.result
 (** [level_of_string s] parses the representation of {!level_to_string}
