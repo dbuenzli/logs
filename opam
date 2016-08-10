@@ -21,7 +21,7 @@ depopts: [
   "lwt" ]
 build: [[
   "ocaml" "pkg/pkg.ml" "build"
-          "--installer" "true"
+          "--pinned" "%{pinned}%"
           "--with-js_of_ocaml" "%{js_of_ocaml:installed}%"
           "--with-fmt" "%{fmt:installed}%"
           "--with-cmdliner" "%{cmdliner:installed}%"
