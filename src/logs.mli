@@ -545,7 +545,7 @@ let reporter ppf =
       | Some tags -> Logs.Tag.find stamp_tag tags
       in
       let dt = match stamp with None -> 0. | Some s -> (Mtime.to_us s) in
-      Format.kfprintf k ppf ("%a[%0+04.0fus] @[" ^^ fmt ^^ "@]@.") dt
+      Format.kfprintf k ppf ("%a[%0+04.0fus] @[" ^^ fmt ^^ "@]@.")
         Logs.pp_header (level, h) dt
     in
     msgf @@ fun ?header ?tags fmt -> with_stamp header tags k ppf fmt
