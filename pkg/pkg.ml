@@ -22,4 +22,12 @@ let () =
        Pkg.mllib ~cond:fmt ~api:[] "src/logs_top.mllib";
        Pkg.lib "src/logs_top_init.ml";
        Pkg.doc "test/tool.ml";
-       Pkg.doc "test/tags.ml"; ]
+       Pkg.doc "test/tags.ml";
+       Pkg.test "test/test_fmt";
+       Pkg.test "test/test_formatter";
+       Pkg.test "test/tool";
+       Pkg.test "test/tags";
+(*       Pkg.test "test/test_browser.js";
+         Pkg.test "test/test_browser.html"; *)
+       Pkg.test "test/test_lwt";
+ ]
