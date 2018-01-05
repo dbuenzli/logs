@@ -337,7 +337,7 @@ val format_reporter :
     {b Important.} This is a synchronous reporter it considers the log
     operation to be over once the message was formatted and before
     calling the continuation (see the {{!Logs.sync}note on synchronous
-    logging}). In particular if the formatters are baked by channels,
+    logging}). In particular if the formatters are backed by channels,
     it will block until the message has been formatted on the channel
     before proceeding which may not be suitable in a cooperative
     concurrency setting like {!Lwt}. *)
