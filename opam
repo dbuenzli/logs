@@ -15,7 +15,7 @@ depends: [
   "result"
   "mtime" {test} ]
 depopts: [
-  "js_of_ocaml"
+  "js_of_ocaml" { >= "3.3.0" }
   "fmt"
   "cmdliner"
   "lwt" ]
