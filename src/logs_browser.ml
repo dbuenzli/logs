@@ -6,6 +6,8 @@
 
 (* Console reporter *)
 
+open Js_of_ocaml
+
 let console_obj = Js.Unsafe.variable "console"
 let console : Logs.level -> string -> unit =
 fun level s ->

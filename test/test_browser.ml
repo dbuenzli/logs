@@ -4,6 +4,8 @@
    %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
+open Js_of_ocaml
+
 let main _ =
   Logs.set_level @@ Some Logs.Debug;
   Logs.set_reporter @@ Logs_browser.console_reporter ();

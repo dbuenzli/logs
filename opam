@@ -19,6 +19,9 @@ depopts: [
   "fmt"
   "cmdliner"
   "lwt" ]
+conflicts: [
+  "js_of_ocaml" { < "3.3.0" } ]
+
 build: [[
   "ocaml" "pkg/pkg.ml" "build"
           "--pinned" "%{pinned}%"
