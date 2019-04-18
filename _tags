@@ -12,4 +12,4 @@ true : bin_annot, safe_string, package(result)
 <test/test_browser*> : package(fmt), package(js_of_ocaml)
 <test/test_lwt*> : package(lwt), package(lwt.unix), package(fmt), \
                    package(fmt.tty)
-<test/tags*> : package(mtime.os)
+<test/tags*> : package(mtime.clock.os)

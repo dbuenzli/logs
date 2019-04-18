@@ -3,13 +3,13 @@
 (* Example with tags and custom reporter. *)
 
 let stamp_tag : Mtime.span Logs.Tag.def =
-  Logs.Tag.def "stamp" ~doc:"Relative monotonic time stamp" Mtime.pp_span
+  Logs.Tag.def "stamp" ~doc:"Relative monotonic time stamp" Mtime.Span.pp
 
-let stamp c = Logs.Tag.(empty |> add stamp_tag (Mtime.count c))
+let stamp c = Logs.Tag.(empty |> add stamp_tag (Mtime_clock.count c))
 
 let run () =
   let rec wait n = if n = 0 then () else wait (n - 1) in
-  let c = Mtime.counter () in
+  let c = Mtime_clock.counter () in
   Logs.info (fun m -> m "Starting run");
   let delay1, delay2, delay3 = 10_000, 20_000, 40_000 in
   Logs.info (fun m -> m "Start action 1 (%d)." delay1 ~tags:(stamp c));
@@ -29,7 +29,7 @@ let reporter ppf =
       | None -> None
       | Some tags -> Logs.Tag.find stamp_tag tags
       in
-      let dt = match stamp with None -> 0. | Some s -> (Mtime.to_us s) in
+      let dt = match stamp with None -> 0. | Some s -> Mtime.Span.to_us s in
       Format.kfprintf k ppf ("%a[%0+04.0fus] @[" ^^ fmt ^^ "@]@.")
         Logs.pp_header (level, h) dt
     in
