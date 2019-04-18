@@ -1,7 +1,12 @@
+v0.6.3 2019-04-19 La Forclaz (VS)
+---------------------------------
 
-
+* Make the package compatible with `js_of_ocaml` 3.3.0's
+  namespacing. Thanks to Hugo Heuzard for the patch.
+* Fix toplevel initialisation for `Omod` (#21).
 * Fix 4.08 `Pervasives` deprecation.
 * Drop support for ocaml < 4.03.0
+* Doc: various improvements and typo fixing.
 
 v0.6.2 2016-08-10 Zagreb
 ------------------------
