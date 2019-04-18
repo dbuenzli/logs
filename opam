@@ -1,6 +1,6 @@
 opam-version: "1.2"
 maintainer: "Daniel Bünzli <daniel.buenzl i@erratique.ch>"
-authors: ["Daniel Bünzli <daniel.buenzl i@erratique.ch>"]
+authors: ["The logs programmers"]
 homepage: "http://erratique.ch/software/logs"
 doc: "http://erratique.ch/software/logs/doc"
 dev-repo: "http://erratique.ch/repos/logs.git"

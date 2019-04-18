@@ -24,8 +24,7 @@ Logs and its reporters are distributed under the ISC license.
 [cmdliner]: http://erratique.ch/software/cmdliner
 [lwt]: http://ocsigen.org/lwt/
 
-Home page: http://erratique.ch/software/logs  
-Contact: Daniel Bünzli `<daniel.buenzl i@erratique.ch>`
+Home page: http://erratique.ch/software/logs
 
 ## Installation
 
