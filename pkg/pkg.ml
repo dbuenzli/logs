@@ -27,6 +27,7 @@ let () =
        Pkg.test "test/test_formatter";
        Pkg.test "test/tool";
        Pkg.test "test/tags";
+       Pkg.test "test/test_multi";
 (*       Pkg.test "test/test_browser.js";
          Pkg.test "test/test_browser.html"; *)
        Pkg.test "test/test_lwt";

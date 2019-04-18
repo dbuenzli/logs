@@ -13,3 +13,4 @@ true : bin_annot, safe_string, package(result)
 <test/test_lwt*> : package(lwt), package(lwt.unix), package(fmt), \
                    package(fmt.tty)
 <test/tags*> : package(mtime.clock.os)
+<test/test_multi*> : package(fmt), package(fmt.tty)
