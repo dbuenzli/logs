@@ -1,19 +1,19 @@
-opam-version: "1.2"
+opam-version: "2.0"
 maintainer: "Daniel Bünzli <daniel.buenzl i@erratique.ch>"
 authors: ["The logs programmers"]
-homepage: "http://erratique.ch/software/logs"
-doc: "http://erratique.ch/software/logs/doc"
-dev-repo: "http://erratique.ch/repos/logs.git"
+homepage: "https://erratique.ch/software/logs"
+doc: "https://erratique.ch/software/logs/doc"
+dev-repo: "git+https://erratique.ch/repos/logs.git"
 bug-reports: "https://github.com/dbuenzli/logs/issues"
 tags: [ "log" "system" "org:erratique" ]
 license: "ISC"
-available: [ ocaml-version >= "4.01.0"]
 depends: [
+  "ocaml" {>= "4.01.0"}
   "ocamlfind" {build}
   "ocamlbuild" {build}
   "topkg" {build}
   "result"
-  "mtime" {test} ]
+  "mtime" {with-test} ]
 depopts: [
   "js_of_ocaml"
   "fmt"
