@@ -21,6 +21,7 @@ let () =
        Pkg.mllib ~cond:lwt "src/logs_lwt.mllib";
        Pkg.mllib ~cond:fmt ~api:[] "src/logs_top.mllib";
        Pkg.lib "src/logs_top_init.ml";
+       Pkg.lib "src/logs_fmt_top_init.ml";
        Pkg.doc "test/tool.ml";
        Pkg.doc "test/tags.ml";
        Pkg.test "test/test_fmt";

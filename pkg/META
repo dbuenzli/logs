@@ -53,7 +53,7 @@ package "lwt" (
 package "top" (
   description = "Logs toplevel support"
   version = "%%VERSION_NUM%%"
-  requires = "fmt.top logs logs.fmt"
+  requires = "logs"
   archive(byte) = "logs_top.cma"
   archive(native) = "logs_top.cmxa"
   plugin(byte) = "logs_top.cma"
