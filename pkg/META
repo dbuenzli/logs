@@ -1,6 +1,5 @@
 description = "Logging infrastructure for OCaml"
 version = "%%VERSION_NUM%%"
-requires = "result"
 archive(byte) = "logs.cma"
 archive(native) = "logs.cmxa"
 plugin(byte) = "logs.cma"

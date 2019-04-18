@@ -16,8 +16,6 @@
 
 (** {1 Log functions} *)
 
-open Result
-
 type 'a log = ('a, unit Lwt.t) Logs.msgf -> unit Lwt.t
 (** The type for Lwt log functions. The returned thread only proceeds
     once the log operation is over. See {!Logs.log}. *)

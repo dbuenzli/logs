@@ -4,8 +4,6 @@
    %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-open Result
-
 let strf = Format.asprintf
 
 let pp_print_text ppf s =

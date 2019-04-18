@@ -17,8 +17,6 @@
 
     {e %%VERSION%% - {{:%%PKG_HOMEPAGE%% }homepage}} *)
 
-open Result
-
 (** {1:levels Reporting levels} *)
 
 (** The type for reporting levels. For level semantics see the
@@ -49,7 +47,7 @@ val level_to_string : level option -> string
     parsed back by {!level_of_string} and by the [LEVEL] option
     argument of {!Logs_cli.level}. *)
 
-val level_of_string : string -> (level option, [`Msg of string]) Result.result
+val level_of_string : string -> (level option, [`Msg of string]) result
 (** [level_of_string s] parses the representation of {!level_to_string}
     from [s]. *)
 

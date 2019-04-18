@@ -4,8 +4,6 @@
    %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-open Result
-
 type 'a log = ('a, unit Lwt.t) Logs.msgf -> unit Lwt.t
 
 let kmsg k ?(src = Logs.default) level msgf = match Logs.Src.level src with
