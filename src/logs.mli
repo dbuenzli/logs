@@ -420,7 +420,7 @@ let () =
 let main () =
   Logs.set_reporter (Logs_fmt.reporter ());
   ...
-  exit (if Logs.err_count > 0 then 1 else 0);
+  exit (if Logs.err_count () > 0 then 1 else 0);
   ()
 ]}
     If you have logging code that is performed in the toplevel
