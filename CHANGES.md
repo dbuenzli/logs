@@ -1,6 +1,6 @@
 
 
-
+* Fix 4.08 `Pervasives` deprecation.
 * Drop support for ocaml < 4.03.0
 
 v0.6.2 2016-08-10 Zagreb

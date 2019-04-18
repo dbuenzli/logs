@@ -72,8 +72,7 @@ module Src = struct
   let level s = s.level
   let set_level s l = s.level <- l
   let equal src0 src1 = src0.uid = src1.uid
-  let compare src0 src1 =
-    (Pervasives.compare : int -> int -> int) src0.uid src1.uid
+  let compare src0 src1 = (compare : int -> int -> int) src0.uid src1.uid
 
   let pp ppf src = Format.fprintf ppf
       "@[<1>(src@ @[<1>(name %S)@]@ @[<1>(uid %d)@] @[<1>(doc %S)@])@]"
