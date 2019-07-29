@@ -22,7 +22,7 @@ let () =
        Pkg.mllib ~cond:cmdliner "src/logs_cli.mllib";
        Pkg.mllib ~cond:lwt "src/logs_lwt.mllib";
        Pkg.mllib ~cond:fmt ~api:[] "src/logs_top.mllib";
-       Pkg.mllib ~cond:threads "src/logs_threads.mllib";
+       Pkg.mllib ~cond:threads "src/logs_threaded.mllib";
        Pkg.lib "src/logs_top_init.ml";
        Pkg.lib "src/logs_fmt_top_init.ml";
        Pkg.doc "test/tool.ml";
@@ -34,6 +34,6 @@ let () =
        Pkg.test "test/test_multi";
 (*       Pkg.test "test/test_browser.js";
          Pkg.test "test/test_browser.html"; *)
-       Pkg.test "test/test_threads";
+       Pkg.test "test/test_threaded";
        Pkg.test "test/test_lwt";
  ]

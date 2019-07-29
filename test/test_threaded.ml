@@ -5,7 +5,7 @@ let loop s =
 
 let () =
   Logs.set_level (Some Logs.Debug);
-  Logs.set_reporter (Logs_threads.thread_safe_reporter (Logs_fmt.reporter ()));
+  Logs.set_reporter (Logs_threaded.thread_safe_reporter (Logs_fmt.reporter ()));
   let t1 = Thread.create loop "aaaa" in
   let t2 = Thread.create loop "bbbb" in
   loop "cccc";
