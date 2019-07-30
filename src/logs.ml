@@ -172,6 +172,14 @@ module Tag = struct
     ()
 end
 
+(* Thread safety *)
+
+type mutex =
+  { lock : unit -> unit; unlock : unit -> unit }
+
+let _mutex = ref { lock = (fun () -> ()); unlock = (fun () -> ()) }
+let set_mutex ~lock ~unlock = _mutex := { lock; unlock }
+
 (* Reporters *)
 
 type ('a, 'b) msgf =
@@ -187,7 +195,10 @@ let nop_reporter = { report = fun _ _ ~over k _ -> over (); k () }
 let _reporter = ref nop_reporter
 let set_reporter r = _reporter := r
 let reporter () = !_reporter
-let report src level ~over k msgf  = !_reporter.report src level ~over k msgf
+let report src level ~over k msgf =
+  let over () = over (); !_mutex.unlock () in
+  !_mutex.lock ();
+  !_reporter.report src level ~over k msgf
 
 let pp_header ppf (l, h) = match h with
 | None -> if l = App then () else Format.fprintf ppf "[%a]" pp_level l
@@ -234,7 +245,8 @@ type 'a log = ('a, unit) msgf -> unit
 
 let over () = ()
 let kmsg : type a b. (unit -> b) -> ?src:src -> level -> (a, b) msgf -> b =
-fun k ?(src = default) level msgf -> match Src.level src with
+fun k ?(src = default) level msgf ->
+match Src.level src with
 | None -> k ()
 | Some level' when level > level' ->
     (if level = Error then incr _err_count else

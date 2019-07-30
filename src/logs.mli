@@ -368,6 +368,12 @@ val warn_count : unit -> int
 (** [warn_count ()] is the number of messages logged with level
     [Warning] across all sources. *)
 
+(** {1 Thread safety} *)
+
+val set_mutex : lock:(unit -> unit) -> unlock:(unit -> unit) -> unit
+(** [set_mutex ~lock ~unlock] sets the mutex functions.
+    [lock] is called before and [unlock] after any thread-unsafe operations. *)
+
 (** {1:basics Basics}
 
     {2:logging Logging}
