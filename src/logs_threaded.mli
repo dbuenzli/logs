@@ -1,6 +1,7 @@
 (** Thread safe logging.
 
-    Linking this library will make Logs thread safe by using a global lock.
-    Setting [Logs.set_mutex] will override this.
-
     {e %%VERSION%% - {{:%%PKG_HOMEPAGE%%}homepage}} *)
+
+val enable : unit -> unit
+(** [enable ()] enables thread-safe logging.
+    It is done setting [Logs.set_mutex], setting it again will remove thread-safety. *)

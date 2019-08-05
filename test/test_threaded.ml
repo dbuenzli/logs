@@ -4,6 +4,7 @@ let loop s =
   done
 
 let () =
+  Logs_threaded.enable ();
   Logs.set_level (Some Logs.Debug);
   Logs.set_reporter (Logs_fmt.reporter ());
   let t1 = Thread.create loop "aaaa" in
