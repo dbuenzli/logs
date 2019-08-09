@@ -449,7 +449,7 @@ let main () =
     If you are writing a library you should neither install reporters, nor
     set the reporting level of sources, nor log on the {!default} source or
     at the [App] level; follow the {{!usage}the usage conventions}. A
-    library should simply log on an another existing source or define
+    library should simply log on another existing source or define
     its own source like in the example below:
 {[
 let src = Logs.Src.create "mylib.network" ~doc:"logs mylib's network events"
