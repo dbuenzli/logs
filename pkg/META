@@ -51,7 +51,7 @@ package "lwt" (
 
 package "threaded" (
   description = "Thread safe logging"
-  version = "%%VERSION_NUM%%
+  version = "%%VERSION_NUM%%"
   requires = "logs threads"
   archive(byte) = "logs_threaded.cma"
   archive(native) = "logs_threaded.cmxa"

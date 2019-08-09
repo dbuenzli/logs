@@ -7,7 +7,7 @@ let jsoo = Conf.with_pkg "js_of_ocaml"
 let cmdliner = Conf.with_pkg "cmdliner"
 let fmt = Conf.with_pkg "fmt"
 let lwt = Conf.with_pkg "lwt"
-let threads = Conf.with_pkg "threads"
+let threads = Conf.with_pkg "base-threads"
 
 let () =
   Pkg.describe "logs" @@ fun c ->
