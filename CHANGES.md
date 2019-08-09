@@ -1,4 +1,5 @@
-
+v0.7.0 2019-08-09 Zagreb
+------------------------
 
 Support for thread safe logging, thanks to Jules Aguillon for the
 work.
