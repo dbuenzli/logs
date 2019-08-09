@@ -346,6 +346,12 @@ val reporter : unit -> reporter
 val set_reporter : reporter -> unit
 (** [set_reporter r] sets the current reporter to [r]. *)
 
+val set_reporter_mutex : lock:(unit -> unit) -> unlock:(unit -> unit) -> unit
+(** [set_reporter_mutex ~lock ~unlock] sets the mutex primitives used
+    to access the reporter. [lock] is called before invoking the
+    reporter and [unlock] after it returns. Initially both [lock] and
+    [unlock] are [fun () -> ()]. *)
+
 (**/**)
 val report : src -> level -> over:(unit -> unit) -> (unit -> 'b) ->
   ('a, 'b) msgf -> 'b
@@ -367,12 +373,6 @@ val err_count : unit -> int
 val warn_count : unit -> int
 (** [warn_count ()] is the number of messages logged with level
     [Warning] across all sources. *)
-
-(** {1 Thread safety} *)
-
-val set_mutex : lock:(unit -> unit) -> unlock:(unit -> unit) -> unit
-(** [set_mutex ~lock ~unlock] sets the mutex functions.
-    [lock] is called before and [unlock] after any thread-unsafe operations. *)
 
 (** {1:basics Basics}
 
@@ -432,6 +432,12 @@ let main () =
     (bad) libraries that do so, you must call and link the reporter
     install code before these initialization bits are being executed
     otherwise you will miss these messages.
+
+    In multi-threaded programs you likely want to ensure mutual
+    exclusion on reporter access. This can be done by invoking
+    {!Logs.set_reporter_mutex} with suitable mutual exclusion
+    primitives. If you use OCaml {!Thread}s simply calling
+    {!Logs_threaded.enable} with handle that for you.
 
     If you need to use multiple reporters in your program see this
     {{!ex2}sample code}.

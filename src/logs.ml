@@ -172,19 +172,15 @@ module Tag = struct
     ()
 end
 
-(* Thread safety *)
-
-type mutex =
-  { lock : unit -> unit; unlock : unit -> unit }
-
-let _mutex = ref { lock = (fun () -> ()); unlock = (fun () -> ()) }
-let set_mutex ~lock ~unlock = _mutex := { lock; unlock }
-
 (* Reporters *)
 
 type ('a, 'b) msgf =
   (?header:string -> ?tags:Tag.set ->
    ('a, Format.formatter, unit, 'b) format4 -> 'a) -> 'b
+
+type reporter_mutex = { lock : unit -> unit; unlock : unit -> unit }
+let _reporter_mutex = ref { lock = (fun () -> ()); unlock = (fun () -> ()) }
+let set_reporter_mutex ~lock ~unlock = _reporter_mutex := { lock; unlock }
 
 type reporter =
   { report :
@@ -196,8 +192,8 @@ let _reporter = ref nop_reporter
 let set_reporter r = _reporter := r
 let reporter () = !_reporter
 let report src level ~over k msgf =
-  let over () = over (); !_mutex.unlock () in
-  !_mutex.lock ();
+  let over () = over (); !_reporter_mutex.unlock () in
+  !_reporter_mutex.lock ();
   !_reporter.report src level ~over k msgf
 
 let pp_header ppf (l, h) = match h with
