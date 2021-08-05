@@ -4,7 +4,7 @@
    %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
-let () = ignore (Toploop.use_file Format.err_formatter "logs_top_init.ml")
+let () = ignore (Toploop.load_file Format.err_formatter "logs_top_init.ml")
 
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 The logs programmers
