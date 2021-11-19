@@ -12,9 +12,9 @@
 
 (** {1 Options for setting the report level} *)
 
-val level : ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
+val level : ?default:Logs.level option -> ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
     Logs.level option Cmdliner.Term.t
-(** [level ?env ?docs ()] is a term for three {!Cmdliner} options that
+(** [level ?default ?env ?docs ()] is a term for three {!Cmdliner} options that
     can be used with {!Logs.set_level}.  The options are documented
     under [docs] (defaults to the default of {!Cmdliner.Arg.info}).
 
@@ -28,7 +28,7 @@ val level : ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
     {- [-q] or [--quiet], the value of the term is [None]. Takes
        over the [-v] and [--verbosity] options.}
     {- If both options are absent the default value is
-       [Some Logs.warning]}}
+       [default] if provided, otherwise [Some Logs.Warning]}.}
 
     If [env] is provided, the default value in case all options are
     absent can be overridden by the corresponding environment

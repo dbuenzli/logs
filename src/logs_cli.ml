@@ -8,7 +8,7 @@ open Cmdliner
 
 let strf = Format.asprintf
 
-let level ?env ?docs () =
+let level ?(default=Some Logs.Warning) ?env ?docs () =
   let vopts =
     let doc = "Increase verbosity. Repeatable, but more than twice does
                not bring more."
@@ -17,7 +17,7 @@ let level ?env ?docs () =
   in
   let verbosity =
     let enum =
-      [ "warning", None; (* Hack for the option's absent rendering *)
+      [ Logs.level_to_string default, None; (* Hack for the option's absent rendering *)
         "quiet", Some None;
         "error", Some (Some Logs.Error);
         "warning", Some (Some Logs.Warning);
@@ -41,7 +41,7 @@ let level ?env ?docs () =
     | Some verbosity -> verbosity
     | None ->
         match List.length vopts with
-        | 0 -> Some Logs.Warning
+        | 0 -> default
         | 1 -> Some Logs.Info
         | n -> Some Logs.Debug
   in
