@@ -22,7 +22,7 @@ depopts: [
 ]
 conflicts: [
   "js_of_ocaml" { < "3.3.0" } 
-  "cmdliner" {< "1.0.0"}
+  "cmdliner" {< "0.9.8"}
 ]
 
 build: [[
