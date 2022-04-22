@@ -21,7 +21,7 @@ val level : ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
     The options work as follows:
     {ul
     {- [-v] or [--verbose], if it appears once, the value of
-       the term is is [Some Logs.Info] and more than once
+       the term is [Some Logs.Info] and more than once
        [Some Logs.Debug].}
     {- [--verbosity=LEVEL], the value of the term is [l] where
        [l] depends on on [LEVEL]. Takes over the option [-v].}
