@@ -480,7 +480,7 @@ module Log = (val Logs.src_log src : Logs.LOG)
     {- [Info], condition that allows the program {e user} to get a better
        understanding of what the program is doing.}
     {- [Debug], condition that allows the program {e developer} to get a
-       better undersanding of what the program is doing.}}
+       better understanding of what the program is doing.}}
 
     {1:sync Note on synchronous logging}
 
