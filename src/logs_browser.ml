@@ -5,9 +5,9 @@
 
 (* Console reporter *)
 
-open Js_of_ocaml
+open Jsoo_runtime
 
-let console_obj = Js.Unsafe.variable "console"
+let console_obj = Js.pure_js_expr "console"
 let console : Logs.level -> string -> unit =
 fun level s ->
   let meth = match level with
@@ -17,7 +17,7 @@ fun level s ->
   | Logs.Debug -> "debug"
   | Logs.App -> "log"
   in
-  Js.Unsafe.meth_call console_obj meth [| Js.Unsafe.inject (Js.string s) |]
+  ignore (Js.meth_call console_obj meth [| Js.string s |])
 
 let ppf, flush =
   let b = Buffer.create 255 in

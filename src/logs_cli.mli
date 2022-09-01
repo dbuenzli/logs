@@ -9,7 +9,7 @@
 
 (** {1 Options for setting the report level} *)
 
-val level : ?env:Cmdliner.Arg.env -> ?docs:string -> unit ->
+val level : ?env:Cmdliner.Cmd.Env.info -> ?docs:string -> unit ->
     Logs.level option Cmdliner.Term.t
 (** [level ?env ?docs ()] is a term for three {!Cmdliner} options that
     can be used with {!Logs.set_level}.  The options are documented

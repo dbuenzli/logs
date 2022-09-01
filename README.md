@@ -40,6 +40,13 @@ instructions.
 
 The documentation can be consulted [online][doc] or via `odig doc logs`. 
 
+Questions are welcome but better asked on the [OCaml forum][ocaml-forum] 
+than on the issue tracker.
+
+[doc]: https://erratique.ch/software/logs/doc
+[ocaml-forum]: https://discuss.ocaml.org/
+
+
 [doc]: http://erratique.ch/software/logs/doc/
 
 ## Sample programs
