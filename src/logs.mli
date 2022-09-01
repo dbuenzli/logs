@@ -1,7 +1,6 @@
 (*---------------------------------------------------------------------------
    Copyright (c) 2015 The logs programmers. All rights reserved.
    Distributed under the ISC license, see terms at the end of the file.
-   %%NAME%% %%VERSION%%
   ---------------------------------------------------------------------------*)
 
 (** Logging.
@@ -13,9 +12,7 @@
     {{!reporters}reporter}.
 
     See the {{!basics}basics}, a few {{!usage}usage conventions} to
-    respect and a note on {{!sync}synchronous logging}.
-
-    {e %%VERSION%% - {{:%%PKG_HOMEPAGE%% }homepage}} *)
+    respect and a note on {{!sync}synchronous logging}. *)
 
 (** {1:levels Reporting levels} *)
 
