@@ -1,5 +1,6 @@
 
-
+* Install one library per directory (#48). Thanks to @mefyl
+  for the suggestion.
 * Requires OCaml >= 4.08, Cmdliner >= 1.1.0, Fmt >= 0.9.0
   and js_of_ocaml-compiler >= 4.0.0
 * Depend on the `js_of_ocaml-compiler.runtime` library rather than 

@@ -9,6 +9,7 @@ plugin(native) = "logs.cmxs"
 package "fmt" (
   description = "Format reporter for Logs"
   version = "%%VERSION_NUM%%"
+  directory = "fmt"
   requires = "logs fmt"
   archive(byte) = "logs_fmt.cma"
   archive(native) = "logs_fmt.cmxa"
@@ -20,6 +21,7 @@ package "fmt" (
 package "browser" (
   description = "Browser console reporter for Logs"
   version = "%%VERSION_NUM%%"
+  directory = "browser"
   requires = "logs js_of_ocaml-compiler.runtime"
   archive(byte) = "logs_browser.cma"
   archive(native) = "logs_browser.cmxa"
@@ -31,6 +33,7 @@ package "browser" (
 package "cli" (
   description = "Cmdliner support for Logs"
   version = "%%VERSION_NUM%%"
+  directory = "cli"
   requires = "logs cmdliner"
   archive(byte) = "logs_cli.cma"
   archive(native) = "logs_cli.cmxa"
@@ -42,6 +45,7 @@ package "cli" (
 package "lwt" (
   description = "Lwt support for Logs"
   version = "%%VERSION_NUM%%"
+  directory = "lwt"
   requires = "logs lwt"
   archive(byte) = "logs_lwt.cma"
   archive(native) = "logs_lwt.cmxa"
@@ -53,6 +57,7 @@ package "lwt" (
 package "threaded" (
   description = "Thread safe logging"
   version = "%%VERSION_NUM%%"
+  directory = "threaded"
   requires = "logs threads"
   archive(byte) = "logs_threaded.cma"
   archive(native) = "logs_threaded.cmxa"
@@ -64,6 +69,7 @@ package "threaded" (
 package "top" (
   description = "Logs toplevel support"
   version = "%%VERSION_NUM%%"
+  directory = "top"
   requires = "logs"
   archive(byte) = "logs_top.cma"
   archive(native) = "logs_top.cmxa"

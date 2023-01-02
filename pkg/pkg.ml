@@ -17,14 +17,15 @@ let () =
   let lwt = Conf.value c lwt in
   let threads = Conf.value c threads in
   Ok [ Pkg.mllib "src/logs.mllib";
-       Pkg.mllib ~cond:fmt "src/logs_fmt.mllib";
-       Pkg.mllib ~cond:jsoo "src/logs_browser.mllib";
-       Pkg.mllib ~cond:cmdliner "src/logs_cli.mllib";
-       Pkg.mllib ~cond:lwt "src/logs_lwt.mllib";
-       Pkg.mllib ~cond:fmt ~api:[] "src/logs_top.mllib";
-       Pkg.mllib ~cond:threads "src/logs_threaded.mllib";
+       Pkg.mllib ~cond:fmt "src/logs_fmt.mllib" ~dst_dir:"fmt";
+       Pkg.mllib ~cond:jsoo "src/logs_browser.mllib" ~dst_dir:"browser";
+       Pkg.mllib ~cond:cmdliner "src/logs_cli.mllib" ~dst_dir:"cli";
+       Pkg.mllib ~cond:lwt "src/logs_lwt.mllib" ~dst_dir:"lwt";
+       Pkg.mllib ~cond:fmt ~api:[] "src/logs_top.mllib" ~dst_dir:"top";
+       Pkg.mllib ~cond:threads "src/logs_threaded.mllib" ~dst_dir:"threads";
        Pkg.lib "src/logs_top_init.ml";
-       Pkg.lib "src/logs_fmt_top_init.ml";
+       Pkg.lib "src/logs_top_init.ml" ~dst:"top/logs_top_init_ml";
+       Pkg.lib "src/logs_fmt_top_init.ml" ~dst:"fmt/logs_fmt_top_init.ml";
        Pkg.doc "test/tool.ml";
        Pkg.doc "test/tags.ml";
        Pkg.test "test/test_fmt";
