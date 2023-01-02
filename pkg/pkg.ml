@@ -22,7 +22,7 @@ let () =
        Pkg.mllib ~cond:cmdliner "src/logs_cli.mllib" ~dst_dir:"cli";
        Pkg.mllib ~cond:lwt "src/logs_lwt.mllib" ~dst_dir:"lwt";
        Pkg.mllib ~cond:fmt ~api:[] "src/logs_top.mllib" ~dst_dir:"top";
-       Pkg.mllib ~cond:threads "src/logs_threaded.mllib" ~dst_dir:"threads";
+       Pkg.mllib ~cond:threads "src/logs_threaded.mllib" ~dst_dir:"threaded";
        Pkg.lib "src/logs_top_init.ml";
        Pkg.lib "src/logs_top_init.ml" ~dst:"top/logs_top_init_ml";
        Pkg.lib "src/logs_fmt_top_init.ml" ~dst:"fmt/logs_fmt_top_init.ml";
