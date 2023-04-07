@@ -292,6 +292,7 @@ module type LOG = sig
   val on_error_msg :
     ?level:level -> ?header:string -> ?tags:Tag.set ->
     use:(unit -> 'a) -> ('a, [`Msg of string]) result -> 'a
+  val level : unit -> level
 end
 
 let src_log src =
@@ -308,6 +309,7 @@ let src_log src =
 
     let on_error_msg ?level ?header ?tags ~use =
       on_error_msg ~src ?level ?header ?tags ~use
+    let level () = level src
   end
   in
   (module Log : LOG)

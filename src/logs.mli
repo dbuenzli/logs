@@ -283,6 +283,9 @@ module type LOG = sig
   val on_error_msg : ?level:level -> ?header:string -> ?tags:Tag.set ->
     use:(unit -> 'a) -> ('a, [`Msg of string]) result -> 'a
   (** See {!Logs.on_error_msg}. *)
+
+  val level : unit -> level
+  (** See {!Logs.level} *)
 end
 
 val src_log : src -> (module LOG)
