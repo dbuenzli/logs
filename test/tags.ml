@@ -29,7 +29,10 @@ let reporter ppf =
       | None -> None
       | Some tags -> Logs.Tag.find stamp_tag tags
       in
-      let dt = match stamp with None -> 0. | Some s -> Mtime.Span.to_us s in
+      let dt = match stamp with
+      | None -> 0.
+      | Some s -> Mtime.Span.to_float_ns s *. 1000.
+      in
       Format.kfprintf k ppf ("%a[%0+04.0fus] @[" ^^ fmt ^^ "@]@.")
         Logs.pp_header (level, h) dt
     in
