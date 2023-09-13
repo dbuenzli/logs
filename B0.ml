@@ -57,8 +57,6 @@ let logs_lwt_lib =
   let requires = [logs; lwt] in
   B0_ocaml.lib logs_lwt ~doc:"The logs.lwt library" ~srcs ~requires
 
-(* Tools *)
-
 (* Tests *)
 
 let test ?doc base ~requires =
@@ -85,39 +83,40 @@ let test_lwt =
 
 let default =
   let meta =
-    let open B0_meta in
-    empty
-    |> add authors ["The logs programmers"]
-    |> add maintainers ["Daniel Bünzli <daniel.buenzl i@erratique.ch>"]
-    |> add homepage "https://erratique.ch/software/logs"
-    |> add online_doc "https://erratique.ch/software/logs/doc"
-    |> add licenses ["ISC"]
-    |> add repo "git+https://erratique.ch/repos/logs.git"
-    |> add issues "https://github.com/dbuenzli/logs/issues"
-    |> add description_tags ["log"; "system"; "org:erratique"; ]
-    |> add B0_opam.Meta.build
+    B0_meta.empty
+    |> B0_meta.(add authors) ["The logs programmers"]
+    |> B0_meta.(add maintainers)
+       ["Daniel Bünzli <daniel.buenzl i@erratique.ch>"]
+    |> B0_meta.(add homepage) "https://erratique.ch/software/logs"
+    |> B0_meta.(add online_doc) "https://erratique.ch/software/logs/doc"
+    |> B0_meta.(add licenses) ["ISC"]
+    |> B0_meta.(add repo) "git+https://erratique.ch/repos/logs.git"
+    |> B0_meta.(add issues) "https://github.com/dbuenzli/logs/issues"
+    |> B0_meta.(add description_tags) ["log"; "system"; "org:erratique"; ]
+    |> B0_meta.tag B0_opam.tag
+    |> B0_meta.add B0_opam.build
       {|[["ocaml" "pkg/pkg.ml" "build" "--dev-pkg" "%{dev}%"
           "--with-js_of_ocaml" "%{js_of_ocaml:installed}%"
           "--with-fmt" "%{fmt:installed}%"
           "--with-cmdliner" "%{cmdliner:installed}%"
           "--with-lwt" "%{lwt:installed}%"
           "--with-base-threads" "%{base-threads:installed}%"]]|}
-    |> add B0_opam.Meta.depopts ["cmdliner", "";
-                                 "js_of_ocaml", "";
-                                 "fmt", "";
-                                 "lwt", "";
-                                 "base-threads", ""]
-    |> add B0_opam.Meta.conflicts [
+    |> B0_meta.add B0_opam.depopts
+      ["cmdliner", "";
+       "js_of_ocaml", "";
+       "fmt", "";
+       "lwt", "";
+       "base-threads", ""]
+    |> B0_meta.add B0_opam.conflicts [
       "cmdliner", {|< "1.1.0"|};
       "js_of_ocaml", {|< "4.0.0"|};
       "fmt", {|< "0.9.0"|}; ]
-    |> add B0_opam.Meta.depends
+    |> B0_meta.add B0_opam.depends
       [ "ocaml", {|>= "4.08.0"|};
         "ocamlfind", {|build|};
         "ocamlbuild", {|build|};
         "topkg", {|build & >= "1.0.3"|};
         "mtime", {|with-test|};]
-    |> tag B0_opam.tag
   in
-  B0_pack.v "default" ~doc:"logs package" ~meta ~locked:true @@
+  B0_pack.make "default" ~doc:"logs package" ~meta ~locked:true @@
   B0_unit.list ()
