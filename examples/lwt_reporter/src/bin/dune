@@ -1,0 +1,16 @@
+(executables
+  (package lwt_reporter_example)
+  (names main)
+  (public_names main)
+  (libraries
+    lwt_reporter_example
+    cmdliner
+    fmt
+    fmt.cli
+    fmt.tty
+    logs
+    logs.cli
+    logs.fmt
+    logs.lwt
+    lwt.unix
+    lwt))
