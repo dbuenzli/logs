@@ -33,7 +33,7 @@ let reporter ppf =
       | None -> 0.
       | Some s -> Mtime.Span.to_float_ns s *. 1000.
       in
-      Format.kfprintf k ppf ("%a[%0+04.0fus] @[" ^^ fmt ^^ "@]@.")
+      Format.kfprintf k ppf ("%a[%0+4.0fus] @[" ^^ fmt ^^ "@]@.")
         Logs.pp_header (level, h) dt
     in
     msgf @@ fun ?header ?tags fmt -> with_stamp header tags k ppf fmt
