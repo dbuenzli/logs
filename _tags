@@ -14,6 +14,6 @@ true : bin_annot, safe_string
 <test/test_browser*> : package(fmt), package(js_of_ocaml)
 <test/test_lwt*> : package(lwt), package(lwt.unix), package(fmt), \
                    package(fmt.tty), thread, package(threads)
-<test/tags*> : package(mtime.clock.os)
+<test/tags*> : package(mtime.clock)
 <test/test_multi*> : package(fmt), package(fmt.tty)
 <test/test_threaded*> : thread, package(threads), package(fmt)

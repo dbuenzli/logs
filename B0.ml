@@ -3,7 +3,7 @@ open B0_kit.V000
 (* OCaml library names *)
 
 let mtime = B0_ocaml.libname "mtime"
-let mtime_clock_os = B0_ocaml.libname "mtime.clock.os"
+let mtime_clock = B0_ocaml.libname "mtime.clock"
 let unix = B0_ocaml.libname "unix"
 let threads = B0_ocaml.libname "threads.posix"
 let cmdliner = B0_ocaml.libname "cmdliner"
@@ -68,7 +68,7 @@ let test_tool =
   let requires = [logs; logs_fmt; logs_cli; fmt_cli; fmt_tty; cmdliner] in
   test "tool" ~requires
 
-let test_tags = test "tags" ~requires:[logs; mtime; mtime_clock_os]
+let test_tags = test "tags" ~requires:[logs; mtime; mtime_clock]
 let test_formatter = test "test_formatter" ~requires:[logs]
 let test_multi = test "test_multi" ~requires:[logs; logs_fmt; fmt_tty]
 let test_threaded =
