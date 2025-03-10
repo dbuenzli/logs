@@ -101,7 +101,7 @@ let default =
           "--with-base-threads" "%{base-threads:installed}%"]]|}
     |> ~~ B0_opam.depopts
       ["cmdliner", "";
-       "js_of_ocaml", "";
+       "js_of_ocaml-compiler", "";
        "fmt", "";
        "lwt", "";
        "base-threads", ""]

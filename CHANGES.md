@@ -1,5 +1,5 @@
-
-
+v0.8.0 2025-03-10 La Forclaz (VS)
+---------------------------------
 
 * Install one library per directory (#48). Thanks to @mefyl
   for the suggestion.
