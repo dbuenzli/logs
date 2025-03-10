@@ -7,13 +7,13 @@ let hello _ msg =
   Logs.info (fun m -> m "End-user information.");
   Logs.debug (fun m -> m "Developer information.");
   Logs.err (fun m -> m "Something bad happened.");
-  Logs.warn (fun m -> m "Something bad may happen in the future.")
+  Logs.warn (fun m -> m "Something bad may happen in the future.");
+  if Logs.err_count () > 0 then 1 else 0
 
 let setup_log style_renderer level =
   Fmt_tty.setup_std_outputs ?style_renderer ();
   Logs.set_level level;
   Logs.set_reporter (Logs_fmt.reporter ())
-
 
 (* Command line interface *)
 
@@ -29,8 +29,6 @@ let msg =
 
 let main () =
   let cmd = Cmd.v (Cmd.info "tool") Term.(const hello $ setup_log $ msg) in
-  match Cmd.eval cmd with
-  | 0 -> exit (if Logs.err_count () > 0 then 1 else 0)
-  | c -> exit c
+  Cmd.eval' cmd
 
-let () = main ()
+let () = if !Sys.interactive then () else exit (main ())

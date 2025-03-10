@@ -28,6 +28,6 @@ let main () =
   err_invalid_kv (fun args -> args k v);
   err_no_carrier (fun () -> ());
   Logs.info (fun m -> m "Ending main");
-  exit (if (Logs.err_count () > 0) then 1 else 0)
+  if (Logs.err_count () > 0) then 1 else 0
 
-let () = main ()
+let () = if !Sys.interactive then () else exit (main ())

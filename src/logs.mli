@@ -421,8 +421,9 @@ let () =
 let main () =
   Logs.set_reporter (Logs_fmt.reporter ());
   ...
-  exit (if Logs.err_count () > 0 then 1 else 0);
-  ()
+  if Logs.err_count () > 0 then 1 else 0
+
+let () = if !Sys.interactive then () else exit (main ())
 ]}
     If you have logging code that is performed in the toplevel
     initialization code of modules (not a good idea) or you depend on
@@ -567,9 +568,9 @@ let main () =
   Logs.set_level (Some Logs.Info);
   run ();
   run ();
-  ()
+  if Logs.err_count () > 0 then 1 else 0
 
-let () = main ()
+let () = if !Sys.interactive then () else main ()
 ]}
 Here is the standard output of a sample run of the program:
 {v
