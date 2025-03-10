@@ -94,7 +94,7 @@ let default =
     |> B0_meta.tag B0_opam.tag
     |> ~~ B0_opam.build
       {|[["ocaml" "pkg/pkg.ml" "build" "--dev-pkg" "%{dev}%"
-          "--with-js_of_ocaml" "%{js_of_ocaml:installed}%"
+          "--with-js_of_ocaml-compiler" "%{js_of_ocaml-compiler:installed}%"
           "--with-fmt" "%{fmt:installed}%"
           "--with-cmdliner" "%{cmdliner:installed}%"
           "--with-lwt" "%{lwt:installed}%"
@@ -107,7 +107,7 @@ let default =
        "base-threads", ""]
     |> B0_meta.add B0_opam.conflicts [
       "cmdliner", {|< "1.3.0"|};
-      "js_of_ocaml", {|< "4.0.0"|};
+      "js_of_ocaml-compiler", {|< "5.5.0"|};
       "fmt", {|< "0.9.0"|}; ]
     |> ~~ B0_opam.depends
       [ "ocaml", {|>= "4.08.0"|};

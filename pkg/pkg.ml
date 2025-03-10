@@ -3,7 +3,7 @@
 #require "topkg"
 open Topkg
 
-let jsoo = Conf.with_pkg "js_of_ocaml"
+let jsoo = Conf.with_pkg "js_of_ocaml-compiler"
 let cmdliner = Conf.with_pkg "cmdliner"
 let fmt = Conf.with_pkg "fmt"
 let lwt = Conf.with_pkg "lwt"
@@ -21,7 +21,8 @@ let () =
        Pkg.mllib ~cond:cmdliner "src/cli/logs_cli.mllib" ~dst_dir:"cli";
        Pkg.mllib ~cond:lwt "src/lwt/logs_lwt.mllib" ~dst_dir:"lwt";
        Pkg.mllib ~cond:fmt ~api:[] "src/top/logs_top.mllib" ~dst_dir:"top";
-       Pkg.mllib ~cond:threads "src/threaded/logs_threaded.mllib" ~dst_dir:"threaded";
+       Pkg.mllib ~cond:threads
+         "src/threaded/logs_threaded.mllib" ~dst_dir:"threaded";
        Pkg.lib "src/top/logs_top_init.ml";
        Pkg.lib "src/top/logs_top_init.ml" ~dst:"top/logs_top_init_ml";
        Pkg.lib "src/fmt/logs_fmt_top_init.ml" ~dst:"fmt/logs_fmt_top_init.ml";
