@@ -1,3 +1,6 @@
+
+* Export `logs` from each sub library.
+
 v0.8.0 2025-03-10 La Forclaz (VS)
 ---------------------------------
 

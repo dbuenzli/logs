@@ -30,21 +30,25 @@ let logs_lib =
   B0_ocaml.lib logs ~srcs:[`Dir ~/"src"] ~requires:[]
 
 let logs_fmt_lib =
-  B0_ocaml.lib logs_fmt ~srcs:[`Dir ~/"src/fmt"] ~requires:[logs; fmt]
+  let srcs = [`Dir ~/"src/fmt"] in
+  B0_ocaml.lib logs_fmt ~srcs ~requires:[logs; fmt] ~exports:[logs]
 
 let logs_browser_lib =
   let srcs = [`Dir ~/"src/browser"] in
-  B0_ocaml.lib logs_browser ~srcs ~requires:[logs; js_of_ocaml_compiler_runtime]
+  let requires = [logs; js_of_ocaml_compiler_runtime] in
+  B0_ocaml.lib logs_browser ~srcs ~requires ~exports:[logs]
 
 let logs_threaded_lib =
   let srcs = [`Dir ~/"src/threaded"] in
-  B0_ocaml.lib logs_threaded ~srcs ~requires:[logs; threads]
+  B0_ocaml.lib logs_threaded ~srcs ~requires:[logs; threads] ~exports:[logs]
 
 let logs_cli_lib =
-  B0_ocaml.lib logs_cli ~srcs:[`Dir ~/"src/cli"] ~requires:[logs; cmdliner]
+  let srcs = [`Dir ~/"src/cli"] in
+  B0_ocaml.lib logs_cli ~srcs ~requires:[logs; cmdliner] ~exports:[logs]
 
 let logs_lwt_lib =
-  B0_ocaml.lib logs_lwt ~srcs:[`Dir ~/"src/lwt"] ~requires:[logs; lwt]
+  let srcs = [`Dir ~/"src/lwt"] in
+  B0_ocaml.lib logs_lwt ~srcs ~requires:[logs; lwt] ~exports:[logs]
 
 let logs_top_lib =
   let srcs = [`Dir ~/"src/top"] in
