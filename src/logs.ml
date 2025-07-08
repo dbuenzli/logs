@@ -3,8 +3,6 @@
    SPDX-License-Identifier: ISC
   ---------------------------------------------------------------------------*)
 
-let strf = Format.asprintf
-
 (* Reporting levels *)
 
 type level = App | Error | Warning | Info | Debug
@@ -28,7 +26,7 @@ let level_of_string = function
 | "warning" -> Ok (Some Warning)
 | "info" -> Ok (Some Info)
 | "debug" -> Ok (Some Debug)
-| l -> Error (`Msg (strf "%S: unknown log level" l))
+| l -> Error (`Msg (Printf.sprintf "%S: unknown log level" l))
 
 (* Sources *)
 
@@ -139,7 +137,7 @@ module Tag = struct
     with Not_found -> None
 
   let get k s = match find k s with
-  | None -> invalid_arg (strf "tag named %s not found in set" k.name)
+  | None -> invalid_arg (Printf.sprintf "tag named %s not found in set" k.name)
   | Some v -> v
 
   let fold f s acc = M.fold (fun _ t acc -> f t acc) s acc
