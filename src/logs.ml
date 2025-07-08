@@ -5,22 +5,6 @@
 
 let strf = Format.asprintf
 
-let pp_print_text ppf s =
-  (* hint spaces and new lines with Format's funs *)
-  let len = String.length s in
-  let left = ref 0 in
-  let right = ref 0 in
-  let flush () =
-    Format.pp_print_string ppf (String.sub s !left (!right - !left));
-    incr right; left := !right;
-  in
-  while (!right <> len) do
-    if s.[!right] = '\n' then (flush (); Format.pp_force_newline ppf ()) else
-    if s.[!right] = ' ' then (flush (); Format.pp_print_space ppf ()) else
-    incr right
-  done;
-  if !left <> len then flush ()
-
 (* Reporting levels *)
 
 type level = App | Error | Warning | Info | Debug
@@ -272,7 +256,7 @@ let on_error_msg ?src ?(level = Error) ?header ?tags ~use = function
 | Ok v -> v
 | Error (`Msg msg) ->
     kmsg use ?src level @@ fun m ->
-    m ?header ?tags "@[%a@]" pp_print_text msg
+    m ?header ?tags "@[%a@]" Format.pp_print_text msg
 
 (* Source specific logging functions *)
 

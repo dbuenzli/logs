@@ -1,4 +1,5 @@
 
+* Use Format.pp_print_text instead of your own.
 * Export `logs` from each sub library.
 
 v0.8.0 2025-03-10 La Forclaz (VS)
