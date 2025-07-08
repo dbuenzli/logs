@@ -1,6 +1,5 @@
 Logs — Logging infrastructure for OCaml
--------------------------------------------------------------------------------
-%%VERSION%%
+=======================================
 
 Logs provides a logging infrastructure for OCaml. Logging is performed
 on sources whose reporting level can be set independently. Log message
@@ -24,7 +23,7 @@ Logs and its reporters are distributed under the ISC license.
 [cmdliner]: http://erratique.ch/software/cmdliner
 [lwt]: http://ocsigen.org/lwt/
 
-Home page: http://erratique.ch/software/logs
+Home page: <http://erratique.ch/software/logs>
 
 ## Installation
 
@@ -46,12 +45,7 @@ than on the issue tracker.
 [doc]: https://erratique.ch/software/logs/doc
 [ocaml-forum]: https://discuss.ocaml.org/
 
-
-[doc]: http://erratique.ch/software/logs/doc/
-
 ## Sample programs
 
-If you installed Logs with `opam` sample programs are located in
-the directory `opam config var logs:doc`.
-
+A few tests can be found in the [`test`](test/) directory.
 
