@@ -4,7 +4,7 @@
   race conditions (#56). Thanks to Nathan Taylor for reporting.
 * Fix `Logs.{err,warn}_count`. The counts were counting the reports
   not the logs which is not what the spec says. This means the counts
-  where wrong when the reporting level was below the corresponding
+  were wrong when the reporting level was below the corresponding
   level (#55). Thanks to Mathieu Barbin for the report.
 * Fix `Log.Tag.list` always returning the empty list.
 * Requires OCaml >= 4.14.
