@@ -1,4 +1,5 @@
-
+v0.9.0 2025-07-08 Zagreb
+------------------------
 
 * Replace references and mutable fields by atomic references to avoid
   race conditions (#56). Thanks to Nathan Taylor for reporting.
