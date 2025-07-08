@@ -7,6 +7,8 @@
   were wrong when the reporting level was below the corresponding
   level (#55). Thanks to Mathieu Barbin for the report.
 * Fix `Log.Tag.list` always returning the empty list.
+* `Logs.format_reporter` and `Logs_fmt.reporter` replace a few format 
+  strings and `^^` uses by direct calls to `Format` primitives.
 * Requires OCaml >= 4.14.
 * Use Format.pp_print_text instead of your own.
 * Export `logs` from each sub library.

@@ -190,23 +190,35 @@ let report src level ~over k msgf =
   mutex.lock ();
   (Atomic.get reporter').report src level ~over k msgf
 
+let pp_brackets pp_v ppf v =
+  Format.pp_print_char ppf '['; pp_v ppf v; Format.pp_print_char ppf ']'
+
 let pp_header ppf (l, h) = match h with
-| None -> if l = App then () else Format.fprintf ppf "[%a]" pp_level l
-| Some h -> Format.fprintf ppf "[%s]" h
+| None -> if l = App then () else pp_brackets pp_level ppf l
+| Some h -> pp_brackets Format.pp_print_string ppf h
 
 let pp_exec_header =
-  let x = match Array.length Sys.argv with
+  let exec = match Array.length Sys.argv with
   | 0 -> Filename.basename Sys.executable_name
   | n -> Filename.basename Sys.argv.(0)
   in
-  let pf = Format.fprintf in
-  let pp_header ppf (l, h) =
-    if l = App then (match h with None -> () | Some h -> pf ppf "[%s] " h) else
-    match h with
-    | None -> pf ppf "%s: [%a] " x pp_level l
-    | Some h -> pf ppf "%s: [%s] " x h
-  in
-  pp_header
+  fun ppf (l, h) ->
+    if l = App then match h with
+    | None -> ()
+    | Some h ->
+        pp_brackets Format.pp_print_string ppf h;
+        Format.pp_print_char ppf ' '
+    else match h with
+    | None ->
+        Format.pp_print_string ppf exec;
+        Format.pp_print_string ppf ": ";
+        pp_brackets pp_level ppf l;
+        Format.pp_print_char ppf ' '
+    | Some h ->
+        Format.pp_print_string ppf exec;
+        Format.pp_print_string ppf ": ";
+        pp_brackets Format.pp_print_string ppf h;
+        Format.pp_print_char ppf ' '
 
 let format_reporter
     ?(pp_header = pp_exec_header)
@@ -214,10 +226,16 @@ let format_reporter
     ?(dst = Format.err_formatter) ()
   =
   let report src level ~over k msgf =
-    let k _ = over (); k () in
+    let k ppf =
+      Format.pp_close_box ppf ();
+      Format.pp_print_newline ppf ();
+      over (); k ()
+    in
     msgf @@ fun ?header ?tags fmt ->
     let ppf = if level = App then app else dst in
-    Format.kfprintf k ppf ("%a@[" ^^ fmt ^^ "@]@.") pp_header (level, header)
+    pp_header ppf (level, header);
+    Format.pp_open_box ppf 0;
+    Format.kfprintf k ppf fmt
   in
   { report }
 
