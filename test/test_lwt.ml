@@ -3,6 +3,8 @@
    SPDX-License-Identifier: ISC
   ---------------------------------------------------------------------------*)
 
+open B0_testing
+
 let ( >>= ) = Lwt.bind
 
 let lwt_reporter () =
@@ -28,18 +30,33 @@ let lwt_reporter () =
   in
   { Logs.report = report }
 
+let test_count () =
+  let logit () =
+    Logs_lwt.warn (fun m -> m "Hey") >>= fun () ->
+    Logs_lwt.err (fun m -> m "Ho") >>= fun () ->
+    Logs_lwt.warn (fun m -> m "Let's go")
+  in
+  Test.int (Logs.err_count ()) 1 ~__POS__;
+  Test.int (Logs.warn_count ()) 1 ~__POS__;
+  Logs.set_level None;
+  logit () >>= fun () ->
+  Test.int (Logs.err_count ()) 2 ~__POS__;
+  Test.int (Logs.warn_count ()) 3 ~__POS__;
+  Lwt.return_unit
+
 let main () =
+  Test.main @@ fun () ->
   Fmt_tty.setup_std_outputs ();
-  Logs.set_level @@ Some Logs.Debug;
   Logs.set_reporter @@ lwt_reporter ();
   Lwt_main.run @@ begin
-    Logs_lwt.info (fun m -> m ~header:"START" ?tags:None "Starting main")
-    >>= fun () -> Logs_lwt.warn (fun m -> m "Hey be warned by %d." 7)
-    >>= fun () -> Logs_lwt.err (fun m -> m "Hey be errored.")
-    >>= fun () -> Logs_lwt.debug (fun m -> m "Be debugged a bit ?")
-    >>= fun () -> Logs_lwt.app (fun m -> m "Application console or stdout.")
-    >>= fun () -> Logs_lwt.info (fun m -> m "Ending main")
-    >>= fun () -> exit (if (Logs.err_count () > 0) then 1 else 0)
-  end
+  Logs.set_level (Some Logs.Debug);
+  Logs_lwt.info (fun m -> m ~header:"START" ?tags:None "Starting main")
+  >>= fun () -> Logs_lwt.warn (fun m -> m "Hey be warned by %d." 7)
+  >>= fun () -> Logs_lwt.err (fun m -> m "Hey be errored.")
+  >>= fun () -> Logs_lwt.debug (fun m -> m "Be debugged a bit ?")
+  >>= fun () -> Logs_lwt.app (fun m -> m "Application console or stdout.")
+  >>= fun () -> Logs_lwt.info (fun m -> m "Ending main")
+  >>= fun () -> test_count ()
+end
 
-let () = main ()
+let () = if !Sys.interactive then () else exit (main ())

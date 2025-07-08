@@ -81,8 +81,8 @@ let test_threaded =
   test ~/"test/test_threaded.ml" ~requires:[logs_fmt; logs_threaded; threads]
 
 let test_lwt =
-  let requires = [logs_fmt; logs_lwt; fmt; fmt_tty; lwt; lwt_unix] in
-  test ~/"test/test_lwt.ml" ~requires ~run:false (* exits with 1 *)
+  let requires = [b0_std; logs_fmt; logs_lwt; fmt; fmt_tty; lwt; lwt_unix] in
+  test ~/"test/test_lwt.ml" ~requires
 
 let test_count = test ~/"test/test_count.ml" ~requires:[b0_std]
 
