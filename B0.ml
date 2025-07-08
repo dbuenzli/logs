@@ -114,7 +114,7 @@ let default =
       "js_of_ocaml-compiler", {|< "5.5.0"|};
       "fmt", {|< "0.9.0"|}; ]
     |> ~~ B0_opam.depends
-      [ "ocaml", {|>= "4.08.0"|};
+      [ "ocaml", {|>= "4.14.0"|};
         "ocamlfind", {|build|};
         "ocamlbuild", {|build|};
         "topkg", {|build & >= "1.0.3"|};

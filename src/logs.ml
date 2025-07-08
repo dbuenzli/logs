@@ -3,11 +3,16 @@
    SPDX-License-Identifier: ISC
   ---------------------------------------------------------------------------*)
 
+let rec atomic_list_cons v atomic =
+  let l = Atomic.get atomic in
+  if Atomic.compare_and_set atomic l (v :: l) then () else
+  atomic_list_cons v atomic
+
 (* Reporting levels *)
 
 type level = App | Error | Warning | Info | Debug
-let _level = ref (Some Warning)
-let level () = !_level
+let level' = Atomic.make (Some Warning)
+let level () = Atomic.get level'
 let pp_level ppf = function
 | App -> ()
 | Error -> Format.pp_print_string ppf "ERROR"
@@ -35,23 +40,23 @@ module Src = struct
     { uid : int;
       name : string;
       doc : string;
-      mutable level : level option }
+      level : level option Atomic.t }
 
   let uid =
-    let id = ref (-1) in
-    fun () -> incr id; !id
+    let id = Atomic.make 0 in
+    fun () -> Atomic.fetch_and_add id 1
 
-  let list = ref []
+  let list = Atomic.make []
 
   let create ?(doc = "undocumented") name =
-    let src = { uid = uid (); name; doc; level = !_level } in
-    list := src :: !list;
-    src
+    let level = Atomic.make (Atomic.get level') in
+    let src = { uid = uid (); name; doc; level } in
+    atomic_list_cons src list; src
 
   let name s = s.name
   let doc s = s.doc
-  let level s = s.level
-  let set_level s l = s.level <- l
+  let level s = Atomic.get (s.level)
+  let set_level s l = Atomic.set s.level l
   let equal src0 src1 = src0.uid = src1.uid
   let compare src0 src1 = (compare : int -> int -> int) src0.uid src1.uid
 
@@ -59,7 +64,7 @@ module Src = struct
       "@[<1>(src@ @[<1>(name %S)@]@ @[<1>(uid %d)@] @[<1>(doc %S)@])@]"
       src.name src.uid src.doc
 
-  let list () = !list
+  let list () = Atomic.get list
 end
 
 type src = Src.t
@@ -67,13 +72,15 @@ type src = Src.t
 let default = Src.create "application" ~doc:"The application log"
 
 let set_level ?(all = true) l =
-  _level := l; if all then List.iter (fun s -> Src.set_level s l) (Src.list ())
+  Atomic.set level' l;
+  if all then List.iter (fun s -> Src.set_level s l) (Src.list ())
 
 (* Message tags *)
 
 module Tag = struct
 
-  (* Universal type, see http://mlton.org/UniversalType *)
+  (* Universal type, see http://mlton.org/UniversalType.
+     Note: we can get rid of that once we have OCaml >= 5.1 *)
 
   type univ = exn
   let univ (type s) () =
@@ -92,20 +99,22 @@ module Tag = struct
 
   type def_e = Def : 'a def -> def_e
 
-  let list = ref ([] : def_e list)
+  let list = Atomic.make ([] : def_e list)
   let uid =
-    let id = ref (-1) in
-    fun () -> incr id; !id
+    let id = Atomic.make 0 in
+    fun () -> Atomic.fetch_and_add id 1
 
   let def ?(doc = "undocumented") name pp =
     let to_univ, of_univ = univ () in
-    { uid = uid (); to_univ; of_univ; name; doc; pp }
+    let tag = { uid = uid (); to_univ; of_univ; name; doc; pp } in
+    atomic_list_cons (Def tag) list;
+    tag
 
   let name d = d.name
   let doc d = d.doc
   let printer d = d.pp
   let pp_def ppf d = Format.fprintf ppf "tag:%s" d.name
-  let list () = !list
+  let list () = Atomic.get list
 
   (* Tag values *)
 
@@ -160,8 +169,11 @@ type ('a, 'b) msgf =
    ('a, Format.formatter, unit, 'b) format4 -> 'a) -> 'b
 
 type reporter_mutex = { lock : unit -> unit; unlock : unit -> unit }
-let _reporter_mutex = ref { lock = (fun () -> ()); unlock = (fun () -> ()) }
-let set_reporter_mutex ~lock ~unlock = _reporter_mutex := { lock; unlock }
+let reporter_mutex' =
+  Atomic.make { lock = (fun () -> ()); unlock = (fun () -> ()) }
+
+let set_reporter_mutex ~lock ~unlock =
+  Atomic.set reporter_mutex' { lock; unlock }
 
 type reporter =
   { report :
@@ -169,13 +181,14 @@ type reporter =
       ('a, 'b) msgf -> 'b }
 
 let nop_reporter = { report = fun _ _ ~over k _ -> over (); k () }
-let _reporter = ref nop_reporter
-let set_reporter r = _reporter := r
-let reporter () = !_reporter
+let reporter' = Atomic.make nop_reporter
+let set_reporter r = Atomic.set reporter' r
+let reporter () = Atomic.get reporter'
 let report src level ~over k msgf =
-  let over () = over (); !_reporter_mutex.unlock () in
-  !_reporter_mutex.lock ();
-  !_reporter.report src level ~over k msgf
+  let mutex = Atomic.get reporter_mutex' in
+  let over () = over (); mutex.unlock () in
+  mutex.lock ();
+  (Atomic.get reporter').report src level ~over k msgf
 
 let pp_header ppf (l, h) = match h with
 | None -> if l = App then () else Format.fprintf ppf "[%a]" pp_level l
@@ -210,13 +223,13 @@ let format_reporter
 
 (* Log functions *)
 
-let _err_count = ref 0
-let err_count () = !_err_count
-let incr_err_count () = incr _err_count
+let err_count' = Atomic.make 0
+let err_count () = Atomic.get err_count'
+let incr_err_count () = Atomic.incr err_count'
 
-let _warn_count = ref 0
-let warn_count () = !_warn_count
-let incr_warn_count () = incr _warn_count
+let warn_count' = Atomic.make 0
+let warn_count () = Atomic.get warn_count'
+let incr_warn_count () = Atomic.incr warn_count'
 
 type 'a log = ('a, unit) msgf -> unit
 
@@ -226,12 +239,12 @@ fun k ?(src = default) level msgf ->
 match Src.level src with
 | None -> k ()
 | Some level' when level > level' ->
-    (if level = Error then incr _err_count else
-     if level = Warning then incr _warn_count else ());
+    (if level = Error then Atomic.incr err_count' else
+     if level = Warning then Atomic.incr warn_count' else ());
     (k ())
 | Some _ ->
-    (if level = Error then incr _err_count else
-     if level = Warning then incr _warn_count else ());
+    (if level = Error then Atomic.incr err_count' else
+     if level = Warning then Atomic.incr warn_count' else ());
     report src level ~over k msgf
 
 let kunit _ = ()

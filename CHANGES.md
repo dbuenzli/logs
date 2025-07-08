@@ -1,4 +1,8 @@
 
+* Replace references and mutable fields by atomic references to avoid
+  race conditions (#56). Thanks to Nathan Taylor for reporting.
+* Fix `Log.Tag.list` always returning the empty list.
+* Requires OCaml >= 4.14.
 * Use Format.pp_print_text instead of your own.
 * Export `logs` from each sub library.
 

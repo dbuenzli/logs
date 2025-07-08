@@ -24,7 +24,7 @@ Logs and its reporters are distributed under the ISC license.
 [cmdliner]: http://erratique.ch/software/cmdliner
 [lwt]: http://ocsigen.org/lwt/
 
-Home page: http://erratique.ch/software/logs"""
+Home page: <http://erratique.ch/software/logs>"""
 maintainer: "Daniel Bünzli <daniel.buenzl i@erratique.ch>"
 authors: "The logs programmers"
 license: "ISC"
@@ -33,7 +33,7 @@ homepage: "https://erratique.ch/software/logs"
 doc: "https://erratique.ch/software/logs/doc"
 bug-reports: "https://github.com/dbuenzli/logs/issues"
 depends: [
-  "ocaml" {>= "4.08.0"}
+  "ocaml" {>= "4.14.0"}
   "ocamlfind" {build}
   "ocamlbuild" {build}
   "topkg" {build & >= "1.0.3"}
