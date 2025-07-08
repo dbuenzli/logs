@@ -2,6 +2,8 @@ open B0_kit.V000
 
 (* OCaml library names *)
 
+let b0_std = B0_ocaml.libname "b0.std"
+
 let compiler_libs_toplevel = B0_ocaml.libname "compiler-libs.toplevel"
 let mtime = B0_ocaml.libname "mtime"
 let mtime_clock = B0_ocaml.libname "mtime.clock"
@@ -81,6 +83,8 @@ let test_threaded =
 let test_lwt =
   let requires = [logs_fmt; logs_lwt; fmt; fmt_tty; lwt; lwt_unix] in
   test ~/"test/test_lwt.ml" ~requires ~run:false (* exits with 1 *)
+
+let test_count = test ~/"test/test_count.ml" ~requires:[b0_std]
 
 (* Packs *)
 

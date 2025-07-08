@@ -234,18 +234,16 @@ let incr_warn_count () = Atomic.incr warn_count'
 type 'a log = ('a, unit) msgf -> unit
 
 let over () = ()
-let kmsg : type a b. (unit -> b) -> ?src:src -> level -> (a, b) msgf -> b =
-fun k ?(src = default) level msgf ->
-match Src.level src with
-| None -> k ()
-| Some level' when level > level' ->
-    (if level = Error then Atomic.incr err_count' else
-     if level = Warning then Atomic.incr warn_count' else ());
-    (k ())
-| Some _ ->
-    (if level = Error then Atomic.incr err_count' else
-     if level = Warning then Atomic.incr warn_count' else ());
-    report src level ~over k msgf
+let kmsg k ?(src = default) level msgf =
+  begin match level with
+  | Error -> Atomic.incr err_count'
+  | Warning -> Atomic.incr warn_count'
+  | _ -> ()
+  end;
+  match Src.level src with
+  | None -> k ()
+  | Some current_level when level > current_level -> k ()
+  | Some _ -> report src level ~over k msgf
 
 let kunit _ = ()
 let msg ?src level msgf = kmsg kunit ?src level msgf
