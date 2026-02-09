@@ -1,0 +1,5 @@
+(library
+ (name lwt_reporter_example)
+ (public_name lwt_reporter_example)
+  (libraries
+    logs))
